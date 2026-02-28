@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    
+    <link rel="stylesheet" href="../css/styleadmin.css">
+    <script src="js/main.js"></script>
+    <script src="js/user.js"></script>
+    <script>
+        window.onload =async function() {
+            loadRoles();
+            loadOrganizations();
+            loadUsers(0);
+            loadOrganizationSelect();
+        }
+    </script>
+</head>
+<body>
+
+<div id="sidebar"></div>
+
+<header id="top-header"></header>
+
+<div id="main-content">
+    <div class="card border-0 shadow-sm p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold">Quản lý tài khoản</h5>
+            <div class="d-flex gap-2">
+                <a href="add-user.html" class="btn btn-primary" >
+                    <i class="bi bi-plus-lg"></i> Thêm mới
+                </a>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="bi bi-file-earmark-excel"></i> Import Excel</button>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <input type="text" id="search" class="form-control" placeholder="Tìm theo tên/email...">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="status">
+                    <option selected value="">Tất cả trạng thái</option>
+                    <option value="true">Đang hoạt động</option>
+                    <option value="false">Đã khóa</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="roles">
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="organizations">
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button onclick="loadUsers(0)" class="btn btn-outline-secondary w-100"><i class="bi bi-funnel"></i> Lọc</button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ảnh</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Quyền</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="list-user">
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="mt-3">
+            <ul id="pagination" class="pagination justify-content-end">
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div class="modal fade" id="userDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    Chi tiết tài khoản
+                </h5>
+
+                <button 
+                    type="button" 
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+
+                    <div class="col-md-4 text-center">
+
+                        <img id="detailAvatar"
+                             src=""
+                             class="img-fluid rounded mb-2"
+                             style="max-height:150px">
+
+                    </div>
+
+                    <div class="col-md-8">
+
+                        <table class="table table-sm">
+
+                            <tr>
+                                <td>Email:</td>
+                                <td id="detailEmail"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Họ tên:</td>
+                                <td id="detailFullName"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Điện thoại:</td>
+                                <td id="detailPhone"></td>
+                            </tr>
+
+                            <tr>
+                                <td>CCCD:</td>
+                                <td id="detailIdc"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Giới tính:</td>
+                                <td id="detailGender"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Ngày sinh:</td>
+                                <td id="detailDob"></td>
+                            </tr>
+                            <tr>
+                                <td>Tuổi:</td>
+                                <td id="detailAge"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Địa chỉ:</td>
+                                <td id="detailAddress"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Trạng thái:</td>
+                                <td id="detailActived"></td>
+                            </tr>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <hr>
+
+                <h6>Vai trò</h6>
+
+                <table class="table table-bordered">
+
+                    <thead>
+                        <tr>
+                            <th>Role</th>
+                            <th>Organization</th>
+                            <th>Head</th>
+                            <th>Default</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="detailAuthorityTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Import Excel</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="formFile" class="form-label fw-bold">Chọn file Excel:</label>
+        <input class="form-control" type="file" id="formFile" accept=".xlsx, .xls">
+        <label class="form-label fw-bold" style="margin-top: 20px;">Chọn organization</label>
+        <select class="form-select" id="organizationSelect">
+        </select>
+
+        <div id="importResult" class="result-import mt-3" style="display:none;">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-file-earmark-check text-success me-2"></i>
+                        <strong>Kết quả import user</strong>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="hideImportResult()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="importMessage" class="alert mb-3" role="alert">
+                    </div>
+                    <div class="row text-center mb-3">
+                        <div class="col-md-4">
+                            <div class="border rounded p-2">
+                                <div class="text-success fw-bold fs-5" id="importSuccessCount">0</div>
+                                <div class="text-muted small">Thêm thành công</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2">
+                                <div class="text-danger fw-bold fs-5" id="importFailCount">0</div>
+                                <div class="text-muted small">Email bị trùng</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded p-2">
+                                <div class="text-primary fw-bold fs-5" id="importTotalCount">0</div>
+                                <div class="text-muted small">Tổng trong file</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="duplicateSection" style="display:none;">
+                        <label class="fw-bold text-danger mb-2">
+                            <i class="bi bi-exclamation-circle me-1"></i>
+                            Danh sách email bị trùng:
+                        </label>
+                        <ul id="duplicateList" class="list-group small" style="max-height:200px; overflow:auto;">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button onclick="readFileExcel()" type="button" class="btn btn-primary">Đọc file</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

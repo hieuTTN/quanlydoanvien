@@ -1,0 +1,167 @@
+/* admin-style.css */
+:root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
+    --header-height: 70px;
+    --primary: #6366f1;
+    --bg-main: #f8fafc;
+    --dark: #1e293b;
+    --text-inactive: #94a3b8;
+}
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    background: var(--bg-main); 
+    margin: 0;
+}
+
+/* Sidebar */
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--dark);
+    position: fixed;
+    top: 0; 
+    left: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    overflow-x: hidden; /* Tránh tràn khi thu gọn */
+}
+
+/* Header */
+#top-header {
+    height: var(--header-height);
+    background: white;
+    position: fixed;
+    top: 0; 
+    left: var(--sidebar-width);
+    right: 0;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    z-index: 999;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Content */
+#main-content {
+    margin-top: var(--header-height);
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Navbar Links */
+.menu-item { 
+    color: var(--text-inactive); 
+    padding: 15px 20px; 
+    text-decoration: none; 
+    display: flex; 
+    align-items: center;
+    overflow: hidden; /* Cực kỳ quan trọng để không vỡ layout */
+    white-space: nowrap; /* Ép không xuống dòng */
+    transition: all 0.2s;
+}
+
+.menu-item:hover { color: white; background: #334155; }
+
+/* Icon giữ kích thước cố định */
+.menu-item i { 
+    margin-right: 15px; 
+    min-width: 20px; 
+    text-align: center;
+    flex-shrink: 0; /* Không cho icon bị bóp méo */
+}
+
+.nav-text {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* --- TRẠNG THÁI THU GỌN --- */
+#sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+
+#sidebar.collapsed .nav-text {
+    opacity: 0;
+    visibility: hidden;
+    display: none; /* Ẩn hoàn toàn khỏi luồng hiển thị */
+}
+
+#sidebar.collapsed + #top-header { left: var(--sidebar-collapsed-width); }
+#sidebar.collapsed + #top-header + #main-content { margin-left: var(--sidebar-collapsed-width); }
+
+/* Hover để hiện lại chữ khi sidebar đang thu gọn */
+#sidebar.collapsed .menu-item:hover .nav-text {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    position: absolute;
+    left: 70px;
+    background: var(--dark);
+    padding: 8px 15px;
+    border-radius: 0 5px 5px 0;
+    z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+
+/* User & Notification */
+.user-profile { cursor: pointer; display: flex; align-items: center; gap: 10px; }
+.notification-icon { position: relative; font-size: 1.2rem; cursor: pointer; }
+.badge-notif { position: absolute; top: -5px; right: -5px; font-size: 0.6rem; }
+/* Sidebar: Sử dụng transform để chuyển động mượt hơn */
+#sidebar {
+    width: var(--sidebar-width);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: width; /* Tối ưu hóa hiệu năng cho trình duyệt */
+}
+
+/* Ẩn chữ mượt mà với opacity và delay */
+.nav-text {
+    opacity: 1;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s;
+    white-space: nowrap;
+}
+
+#sidebar.collapsed .nav-text {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.1s ease-in-out; /* Ẩn nhanh hơn khi thu gọn */
+}
+
+/* Header và Content: Chuyển động đồng bộ */
+#top-header, #main-content {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Ẩn tiêu đề khi thu gọn */
+#sidebar.collapsed .sidebar-title {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+/* Tùy chọn: Nếu muốn hiện icon nhỏ khi thu gọn thay vì ẩn sạch */
+.sidebar-logo-small {
+    display: none;
+    text-align: center;
+    padding: 15px 0;
+}
+
+#sidebar.collapsed .sidebar-logo-small {
+    display: block;
+}
+.form-add-user{
+    margin-top: 15px;
+}
+.btnchonanh{
+    /* width: 100%; */
+    border: none;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    color: #fff;
+    font-size: 1.2rem;
+}
+#btnchoosefile{
+    background-size: 100%;
+}

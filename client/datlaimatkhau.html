@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="image/logo.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="js/user.js"></script>
+</head>
+<body>
+  <div class="main-wrapper">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-5 col-lg-4">
+                <div class="card login-card p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <h4 class="fw-bold">Thiết lập mật khẩu mới</h4>
+                        <p class="text-muted">Nhập mật khẩu mới để tiếp tục truy cập</p>
+                    </div>
+
+                    <form id="resetForm">
+                        <div class="mb-3 input-group-custom position-relative">
+                            <input type="password" class="form-control" id="newPassword" required placeholder=" ">
+                            <label class="floating-label">Mật khẩu mới</label>
+                            <i class='bx bx-hide toggle-password' onclick="togglePass('newPassword', this)"></i>
+                        </div>
+                        
+                        <div class="mb-4 input-group-custom position-relative">
+                            <input type="password" class="form-control" id="confirmPassword" required placeholder=" ">
+                            <label class="floating-label">Xác nhận mật khẩu</label>
+                            <i class='bx bx-hide toggle-password' onclick="togglePass('confirmPassword', this)"></i>
+                        </div>
+
+                        <button type="submit" class="btn btn-login w-100 fw-bold">Cập nhật mật khẩu</button>
+                    </form>
+                    <div id="feedback" class="mt-3 text-center small"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Hàm ẩn/hiện mật khẩu
+    function togglePass(id, icon) {
+        const input = document.getElementById(id);
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        icon.classList.toggle('bx-show');
+    }
+
+    // Logic kiểm tra mật khẩu khớp nhau
+    document.getElementById('resetForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const pass = document.getElementById('newPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+        const feedback = document.getElementById('feedback');
+
+        if(pass !== confirm) {
+            feedback.innerText = "Mật khẩu không khớp, vui lòng kiểm tra lại!";
+            feedback.className = "mt-3 text-center text-danger small";
+        } else if(pass.length < 8) {
+            feedback.innerText = "Mật khẩu phải có ít nhất 8 ký tự!";
+            feedback.className = "mt-3 text-center text-warning small";
+        } else {
+            feedback.innerText = "Đang xử lý...";
+            // Gửi dữ liệu lên Server tại đây
+            alert("Mật khẩu đã được thay đổi thành công!");
+        }
+    });
+</script>
+</body>
+</html>

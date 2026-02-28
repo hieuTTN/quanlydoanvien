@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="../css/styleadmin.css">
+    <script src="js/main.js"></script>
+    <script src="js/log.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadLogs(0); 
+        });
+    </script>
+</head>
+<body>
+
+<div id="sidebar"></div>
+
+<header id="top-header"></header>
+
+<div id="main-content">
+    <h5 class="fw-bold mb-4">Nhật ký hệ thống (System Logs)</h5>
+
+    <div class="card border-0 shadow-sm p-4 mb-4">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <input type="text" id="dateRange" class="form-control" placeholder="Chọn khoảng ngày...">
+            </div>
+            <div class="col-md-3">
+                <input type="text" id="search" class="form-control" placeholder="Tìm kiếm (User, Hành động...)">
+            </div>
+            <div class="col-md-2">
+                <select id="logLevel" class="form-select">
+                    <option value="">Tất cả mức độ</option>
+                    <option value="INFO">INFO</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="ERROR">ERROR</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary w-100" onclick="loadLogs(0)">
+                    <i class="bi bi-filter"></i> Lọc
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Người thực hiện</th>
+                        <th>Hành động</th>
+                        <th>Mức độ</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody">
+                    <tr>
+                        <td class="text-muted">2026-02-27 18:30:05</td>
+                        <td>admin_nguyen</td>
+                        <td>UPDATE_ORGANIZATION</td>
+                        <td>Liên Đoàn X</td>
+                        <td><span class="badge bg-info">INFO</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">2026-02-27 18:25:10</td>
+                        <td>user_tran</td>
+                        <td>DELETE_ORGANIZATION</td>
+                        <td>Đạo B</td>
+                        <td><span class="badge bg-danger">ERROR</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center" id="pagination">
+                <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<script>
+    $(function() {
+        $('#dateRange').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: "Áp dụng",
+                cancelLabel: "Xóa",
+                daysOfWeek: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+                monthNames: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"]
+            }
+        });
+
+        // Cập nhật text vào input sau khi chọn
+        $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+        });
+
+        $('#dateRange').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+    });
+    </script>
+</body>
+</html>
