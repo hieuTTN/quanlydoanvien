@@ -3,6 +3,7 @@ package com.web.service;
 
 import com.web.dto.*;
 import com.web.entity.*;
+import com.web.enums.LogLevel;
 import com.web.exception.MessageException;
 import com.web.jwt.JwtTokenProvider;
 import com.web.mapper.UserMapper;
@@ -72,6 +73,9 @@ public class UserService {
 
     @Autowired
     private WardsRepository wardsRepository;
+
+    @Autowired
+    private AuditLogService auditLogService;
 
 
 
@@ -180,11 +184,14 @@ public class UserService {
         return result;
     }
 
+    @Transactional
     public void delete(Long categoryId) {
         try {
+            User u = userRepository.findById(categoryId).orElse(null);
             userRepository.deleteById(categoryId);
+            auditLogService.save("Xóa tài khoản, id: "+categoryId+" - Email: "+u.getEmail(), LogLevel.WARNING);
         }catch (Exception e){
-            throw new MessageException("User này không thể xóa");
+            throw new MessageException("User này không thể xóa do có nhiều liên kết");
         }
     }
 
@@ -288,6 +295,7 @@ public class UserService {
         }
         file.close();
         workbook.close();
+
     }
 
     private boolean checkIfRowIsEmpty(Row row) {
@@ -314,15 +322,13 @@ public class UserService {
             userRepository.save(user);
         }
         else{
-            throw new MessageException("Invalid password", 500);
+            throw new MessageException("Mật khẩu cũ không chính xác", 500);
         }
     }
 
     @Transactional
     public User save(UserDTO dto) {
-
         User user;
-
         if (dto.getId() == null) {
 
             // CREATE
@@ -339,7 +345,7 @@ public class UserService {
             user.setCreatedDate(new Date(System.currentTimeMillis()));
 
             user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
+            auditLogService.save("Tạo tài khoản mới, Email: "+dto.getEmail(), LogLevel.INFO);
         }
         else {
 
@@ -359,6 +365,7 @@ public class UserService {
 
             }
             // nếu null hoặc empty -> giữ nguyên password cũ
+            auditLogService.save("Cập nhật thông tin tài khoản, Email: "+dto.getEmail(), LogLevel.INFO);
 
         }
 

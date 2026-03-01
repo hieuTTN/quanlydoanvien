@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <link rel="icon" type="image/x-icon" href="/image/logo.webp">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Sofia">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" href="../css/styleadmin.css">
+    <script src="js/main.js"></script>
+    <script src="js/event.js"></script>
+    <script src="js/address.js"></script>
+    <script>
+        window.onload =async function() {
+            await loadAddress();
+            await loadOrganizations();
+        }   
+    </script>
+</head>
+<body>
+
+<div id="sidebar"></div>
+
+<header id="top-header"></header>
+
+<div id="main-content">
+    <div class="card border-0 shadow-sm p-4">
+    <h5 class="fw-bold mb-4">Thêm mới sự kiện</h5>
+    <div id="userForm">
+
+    <input type="hidden" id="userId">
+
+    <div class="row g-3">
+        <div class="col-md-2">
+            <div class="row">
+                <div class="col-6 col-md-12 col-lg-12">
+                    <button type="button" id="btnchoosefile" onclick="document.getElementById('fileanhdaidientl').click(); return false;" class="btnchonanh" style="background-image: url('/image/backluuanh.png');">
+                        <i class="fa fa-camera camera"></i><br><span class="tieudetaianhdd">Tải banner sự kiện</span>
+                    </button>
+                </div>
+                <div class="col-6 col-md-12 col-lg-12">
+                    <img id="imgpreviewtl" class="imgpreviewtl">
+                </div>
+                <input onchange="chooseAvatar()" type="file" id="fileanhdaidientl" style="display: none;">
+            </div>
+            <div class="col-md-12">
+
+            </div>
+        </div>
+        <div class="col-md-5">
+            <!-- CCCD -->
+            <div class="col-md-12">
+                <div class="form-floating form-add-user">
+                    <input class="form-control" id="idc" placeholder="CCCD">
+                    <label>CCCD</label>
+                </div>
+            </div>
+            <!-- DOB -->
+            <div class="heading-container">
+                <span class="line"></span>
+                <h2 class="title">Chọn thời gian tổ chức</h2>
+                <span class="line"></span>
+            </div>
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-7 form-add-user">
+                        <div class="form-floating form-add-user">
+                            <input type="text" id="dateRange" class="form-control" placeholder="Ngày bắt đầu và ngày kết thúc...">
+                            <label>Chọn ngày bắt đầu và ngày kết thúc sự kiện</label>
+                        </div>
+                    </div>
+                    <div class="col-md-5 form-add-user">
+                        <div class="form-floating form-add-user">
+                            <input class="form-control" type="date" id="endDate" placeholder="Ngày kết thúc đăng ký">
+                            <label>Chọn ngày kết thúc đăng ký</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="heading-container">
+                <span class="line"></span>
+                <h2 class="title">Chọn tổ chức</h2>
+                <span class="line"></span>
+            </div>
+            <!-- Gender -->
+            <div class="col-md-12">
+                <select id="organizations" class="form-select">
+                </select>
+            </div>
+            <!-- Address -->
+            <div class="col-md-12">
+                <div class="heading-container">
+                    <span class="line"></span>
+                    <h2 class="title">Chọn địa chỉ tổ chức</h2>
+                    <span class="line"></span>
+                </div>
+                <div class="row">
+                    <div class="col-md-6  form-add-user">
+                        <select onchange="loadHuyenOnchange()" id="tinh" class="form-control select2">
+
+                        </select>
+                    </div>
+                    <div class="col-md-6 form-add-user">
+                        <select id="xa" class="form-control">
+                            <option value="" hidden="">---</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-floating form-add-user">
+                    <input class="form-control" id="stressName" placeholder="Address">
+                    <label>Chi tiết địa chỉ (tên đường, số nhà)</label>
+                </div>
+            </div>
+            <input class="form-control" id="avatar" type="hidden">
+        </div>
+        <div class="col-md-5">
+            <div class="heading-container">
+                <span class="line"></span>
+                <h2 class="title">Nhập nội dung sự kiện</h2>
+                <span class="line"></span>
+            </div>
+            <textarea id="editor" name="content"></textarea>
+        </div>
+
+    </div>
+    <hr>
+    <button onclick="saveUser()" id="btn-submit" class="btn btn-primary">
+
+        Lưu sự kiện
+
+    </button>
+
+</form>
+</div>
+</div>
+<script>
+    $(function() {
+        $('#dateRange').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: "Áp dụng",
+                cancelLabel: "Xóa",
+                daysOfWeek: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+                monthNames: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"]
+            }
+        });
+
+        // Cập nhật text vào input sau khi chọn
+        $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+        });
+
+        $('#dateRange').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+    });
+</script>
+<script src="https://cdn.tiny.cloud/1/f6s0gxhkpepxkws8jawvfwtj0l9lv0xjgq1swbv4lgcy3au3/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: 'textarea#editor', // Chọn textarea có id là 'editor'
+    // Tăng cường các plugin để hỗ trợ nhiều chức năng hơn
+    plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak ' +
+            'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking ' +
+            'table emoticons template paste codesample help',
+    // Định nghĩa các nút trên thanh công cụ. Chia thành nhiều dòng để dễ quản lý.
+    toolbar: 'undo redo | blocks | ' + // Hoàn tác, làm lại, và định dạng khối (Heading 1, 2, Paragraph,...)
+            'bold italic underline strikethrough | forecolor backcolor | ' + // Định dạng chữ: đậm, nghiêng, gạch chân, gạch ngang, màu chữ, màu nền
+            'alignleft aligncenter alignright alignjustify | outdent indent | ' + // Căn lề, lùi dòng
+            'numlist bullist | link image media table | ' + // Danh sách số, danh sách dấu chấm, chèn liên kết, ảnh, video, bảng
+            'charmap emoticons | fullscreen code preview | help', // Ký tự đặc biệt, biểu tượng cảm xúc, chế độ toàn màn hình, xem trước, mã nguồn, trợ giúp
+    height: 600, // Tăng chiều cao của trình soạn thảo
+    menubar: 'file edit view insert format tools table help', // Hiện thêm menu bar ở trên cùng
+    images_upload_handler: async function (blobInfo, success, failure) {
+      const formData = new FormData();
+      formData.append('file', blobInfo.blob(), blobInfo.filename());
+
+      const res = await fetch('/adm-prj/qtht-001/api/upload/upload-file', {
+        method: 'POST',
+        body: formData
+      });
+      if (res.status < 300) {
+        var linkImage = await res.text();
+        success(linkImage);
+      }
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,3 +1,5 @@
+var exceptionCode = 417;
+var token = localStorage.getItem("token");
 $( document ).ready(function() {
     var menu = 
     `<div class="sidebar-title p-4 text-white fw-bold fs-4">ĐOÀN TNCS HCM</div>
@@ -22,16 +24,25 @@ $( document ).ready(function() {
             <a href="add-tochuc.html" class="menu-item ps-5"><i class="bi bi-plus-circle"></i> <span class="nav-text">Thêm mới</span></a>
         </div>
 
-        <a href="log.html" class="menu-item"><i class="bi bi-file-earmark-text"></i> <span class="nav-text">Quản lý log</span></a>
-
         <a href="#" class="menu-item" data-bs-toggle="collapse" data-bs-target="#menu3">
-            <i class="bi bi-gear"></i> <span class="nav-text">Cài đặt</span> 
+            <i class="bi bi-calendar-event"></i> <span class="nav-text">Quản lý sự kiện</span> 
             <i class="bi bi-chevron-down ms-auto nav-text"></i>
         </a>
         <div class="collapse" id="menu3">
+            <a href="sukien.html" class="menu-item ps-5"><i class="bi bi-building"></i> <span class="nav-text">Danh sách</span></a>
+            <a href="add-sukien.html" class="menu-item ps-5"><i class="bi bi-plus-circle"></i> <span class="nav-text">Thêm mới</span></a>
+        </div>
+
+        <a href="log.html" class="menu-item"><i class="bi bi-file-earmark-text"></i> <span class="nav-text">Quản lý log</span></a>
+
+        <a href="#" class="menu-item" data-bs-toggle="collapse" data-bs-target="#menu4">
+            <i class="bi bi-gear"></i> <span class="nav-text">Cài đặt</span> 
+            <i class="bi bi-chevron-down ms-auto nav-text"></i>
+        </a>
+        <div class="collapse" id="menu4">
             <a href="doimatkhau.html" class="menu-item ps-5"><i class="bi bi-key"></i> <span class="nav-text">Đổi mật khẩu</span></a>
             <a href="infor.html" class="menu-item ps-5"><i class="bi bi-person-circle"></i> <span class="nav-text">Thông tin cá nhân</span></a>
-            <a href="#" class="menu-item ps-5"><i class="bi bi-box-arrow-right"></i> <span class="nav-text">Đăng xuất</span></a>
+            <a href="#" onclick="logout()" class="menu-item ps-5"><i class="bi bi-box-arrow-right"></i> <span class="nav-text">Đăng xuất</span></a>
         </div>
     </div>`
     document.getElementById('sidebar').innerHTML = menu;
@@ -86,4 +97,10 @@ $( document ).ready(function() {
 });
 
 function loadInforHeader() {
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login.html";
 }

@@ -2,6 +2,7 @@ package com.web.service;
 
 import com.web.dto.ImportUserResult;
 import com.web.entity.*;
+import com.web.enums.LogLevel;
 import com.web.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
@@ -28,6 +29,7 @@ public class UserImportService {
 
     private final UserAuthorityRepository userAuthorityRepository;
 
+    private final AuditLogService auditLogService;
 
     @Transactional
     public ImportUserResult importExcel(MultipartFile file, Long organizationId)
@@ -159,7 +161,7 @@ public class UserImportService {
                             ", bỏ qua " + skippedEmails.size()
             );
         }
-
+        auditLogService.save("Tạo tài khoản mới bằng file excel<br>Thành công: "+result.getInserted()+"<>Thất bại: "+result.getSkipped(), LogLevel.INFO);
         return result;
     }
 

@@ -165,3 +165,26 @@ body {
 #btnchoosefile{
     background-size: 100%;
 }
+.heading-container {
+    margin-top: 15px;
+    display: flex;
+    align-items: center; /* Giúp căn giữa theo chiều dọc */
+    gap: 15px;           /* Khoảng cách giữa chữ và đường kẻ */
+    width: 100%;         /* Hoặc độ rộng bạn muốn */
+}
+.heading-container .title {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.line {
+  flex-grow: 1;        /* Đường kẻ sẽ chiếm phần không gian còn lại */
+  height: 1px;         /* Độ dày của đường kẻ */
+  background-color: #6daee0; /* Màu sắc của đường kẻ (bạn có thể thay đổi) */
+}
+
+.title {
+  font-size: 24px;     /* Kích thước chữ */
+  color: #333;         /* Màu chữ */
+  white-space: nowrap; /* Đảm bảo chữ không bị xuống dòng */
+}

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,13 +22,19 @@ public class Event {
     private String description;
 
     private LocalDateTime startTime;
+
     private LocalDateTime endTime;
+
     private LocalDateTime registrationDeadline;
 
     private String location; // Link Google Maps hoặc địa chỉ
+
     private Integer maxParticipants;
+
     private Double fee; // Optional
+
     private String attachmentUrl; // Link tới file kế hoạch/form
+
     private String bannerUrl;
 
     @Enumerated(EnumType.STRING)
