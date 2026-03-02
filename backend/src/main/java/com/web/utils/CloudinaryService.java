@@ -21,9 +21,14 @@ public class CloudinaryService {
     public String uploadFile(MultipartFile file) {
         try {
             File uploadedFile = convertMultiPartToFile(file);
-            Map uploadResult = cloudinaryConfig.uploader().upload(uploadedFile, ObjectUtils.emptyMap());
+            Map uploadResult = cloudinaryConfig.uploader().upload(uploadedFile,   ObjectUtils.asMap(
+                    "resource_type", "auto",
+                    "use_filename", true,
+                    "unique_filename", false,
+                    "overwrite", true
+            ));
             uploadedFile.delete();
-            return  uploadResult.get("url").toString();
+            return  uploadResult.get("secure_url").toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

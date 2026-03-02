@@ -28,6 +28,8 @@
         window.onload =async function() {
             await loadAddress();
             await loadOrganizations();
+            await loadStatusAdd();
+            loadAEvent();
         }   
     </script>
 </head>
@@ -42,13 +44,11 @@
     <h5 class="fw-bold mb-4">Thêm mới sự kiện</h5>
     <div id="userForm">
 
-    <input type="hidden" id="userId">
-
     <div class="row g-3">
         <div class="col-md-2">
             <div class="row">
                 <div class="col-6 col-md-12 col-lg-12">
-                    <button type="button" id="btnchoosefile" onclick="document.getElementById('fileanhdaidientl').click(); return false;" class="btnchonanh" style="background-image: url('/image/backluuanh.png');">
+                    <button type="button" id="btnchoosefile" onclick="document.getElementById('fileanhdaidientl').click(); return false;" class="btnchonanh form-control" style="background-image: url('/image/backluuanh.png');">
                         <i class="fa fa-camera camera"></i><br><span class="tieudetaianhdd">Tải banner sự kiện</span>
                     </button>
                 </div>
@@ -57,19 +57,50 @@
                 </div>
                 <input onchange="chooseAvatar()" type="file" id="fileanhdaidientl" style="display: none;">
             </div>
-            <div class="col-md-12">
+           <div class="col-md-12">
+            <div class="upload-box" id="uploadBox">
+                <input type="file" id="fileInput" hidden>
 
-            </div>
-        </div>
-        <div class="col-md-5">
-            <!-- CCCD -->
-            <div class="col-md-12">
-                <div class="form-floating form-add-user">
-                    <input class="form-control" id="idc" placeholder="CCCD">
-                    <label>CCCD</label>
+                <div class="upload-content" id="uploadContent">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Click để chọn file</div>
+                    <div class="upload-subtext">Hoặc kéo thả file vào đây</div>
                 </div>
             </div>
-            <!-- DOB -->
+            <input type="hidden" id="attachmentUrl">
+
+        </div>
+        </div>
+        <div class="col-md-5">
+            <div class="col-md-12">
+                <div class="form-floating form-add-user">
+                    <input class="form-control" id="name" placeholder="Tên sự kiện">
+                    <label>Tên sự kiện</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating form-add-user">
+                        <input class="form-control" id="maxParticipants" placeholder="Số lượng người tham gia tối đa">
+                        <label>SL người tham gia tối đa</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating form-add-user">
+                        <input class="form-control" id="fee" placeholder="Chi phí tham gia">
+                        <label>Chi phí tham gia</label>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="heading-container">
+                    <span class="line"></span>
+                    <h2 class="title">Trạng thái sự kiện</h2>
+                    <span class="line"></span>
+                </div>
+                <div id="statusContainer" class="status-container"></div>
+            </div>
+            <input type="hidden" id="status">
             <div class="heading-container">
                 <span class="line"></span>
                 <h2 class="title">Chọn thời gian tổ chức</h2>
@@ -85,7 +116,7 @@
                     </div>
                     <div class="col-md-5 form-add-user">
                         <div class="form-floating form-add-user">
-                            <input class="form-control" type="date" id="endDate" placeholder="Ngày kết thúc đăng ký">
+                            <input class="form-control" type="datetime-local" id="endDate" placeholder="Ngày kết thúc đăng ký">
                             <label>Chọn ngày kết thúc đăng ký</label>
                         </div>
                     </div>
@@ -122,7 +153,11 @@
                 </div>
                 <div class="form-floating form-add-user">
                     <input class="form-control" id="stressName" placeholder="Address">
-                    <label>Chi tiết địa chỉ (tên đường, số nhà)</label>
+                    <label>Chi tiết địa chỉ (tên đường, thôn xóm,...)</label>
+                </div>
+                <div class="form-floating form-add-user">
+                    <input class="form-control" id="linkmap" placeholder="Address">
+                    <label>Link google map</label>
                 </div>
             </div>
             <input class="form-control" id="avatar" type="hidden">
@@ -138,7 +173,7 @@
 
     </div>
     <hr>
-    <button onclick="saveUser()" id="btn-submit" class="btn btn-primary">
+    <button onclick="saveEvent()" id="btn-submit" class="btn btn-primary">
 
         Lưu sự kiện
 
@@ -151,26 +186,38 @@
     $(function() {
         $('#dateRange').daterangepicker({
             autoUpdateInput: false,
+            timePicker: true,
+            timePicker24Hour: true,
+            timePickerSeconds: false,
+            timePickerIncrement: 5, // nhảy 5 phút 1 lần
+
             locale: {
-                format: 'DD/MM/YYYY',
+                format: 'DD/MM/YYYY HH:mm',
                 applyLabel: "Áp dụng",
                 cancelLabel: "Xóa",
                 daysOfWeek: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
-                monthNames: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"]
+                monthNames: [
+                    "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4",
+                    "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8",
+                    "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+                ]
             }
         });
 
-        // Cập nhật text vào input sau khi chọn
         $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
-            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
+            $(this).val(
+                picker.startDate.format('DD/MM/YYYY HH:mm') +
+                ' - ' +
+                picker.endDate.format('DD/MM/YYYY HH:mm')
+            );
         });
 
-        $('#dateRange').on('cancel.daterangepicker', function(ev, picker) {
+        $('#dateRange').on('cancel.daterangepicker', function() {
             $(this).val('');
         });
     });
 </script>
-<script src="https://cdn.tiny.cloud/1/f6s0gxhkpepxkws8jawvfwtj0l9lv0xjgq1swbv4lgcy3au3/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/f6s0gxhkpepxkws8jawvfwtj0l9lv0xjgq1swbv4lgcy3au3/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
   tinymce.init({
     selector: 'textarea#editor', // Chọn textarea có id là 'editor'
@@ -186,11 +233,18 @@
             'charmap emoticons | fullscreen code preview | help', // Ký tự đặc biệt, biểu tượng cảm xúc, chế độ toàn màn hình, xem trước, mã nguồn, trợ giúp
     height: 600, // Tăng chiều cao của trình soạn thảo
     menubar: 'file edit view insert format tools table help', // Hiện thêm menu bar ở trên cùng
+    setup: function (editor) {
+        editor.on('init', function () {
+            if (!editor.getContent().trim()) {
+                editor.setContent(getEventTemplate());
+            }
+        });
+    },
     images_upload_handler: async function (blobInfo, success, failure) {
       const formData = new FormData();
       formData.append('file', blobInfo.blob(), blobInfo.filename());
 
-      const res = await fetch('/adm-prj/qtht-001/api/upload/upload-file', {
+      const res = await fetch('http://localhost:8080/api/public/upload-file', {
         method: 'POST',
         body: formData
       });
@@ -201,5 +255,149 @@
     }
   });
 </script>
+
+
+<script>
+    const uploadBox = document.getElementById('uploadBox');
+    const fileInput = document.getElementById('fileInput');
+    const uploadContent = document.getElementById('uploadContent');
+
+    uploadBox.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change',async function () {
+        if (this.files.length > 0) {
+                // Tải file lên server
+            document.getElementById("btn-submit").disabled = true
+            document.getElementById("btn-submit").innerText = "Đang tải file hướng dẫn..."
+            const filePath = document.getElementById('fileInput')
+            const formData = new FormData()
+            formData.append("file", filePath.files[0])
+            var urlUpload = 'http://localhost:8080/api/public/upload-file';
+            const res = await fetch(urlUpload, {
+                method: 'POST',
+                body: formData
+            });
+            if (res.status < 300) {
+                const linkFile = await res.text();
+                document.getElementById("attachmentUrl").value = linkFile;
+                const file = this.files[0];
+                const fileSize = (file.size / 1024).toFixed(2) + " KB";
+                uploadContent.innerHTML = `
+                    <div class="file-info">
+                        <div style="font-size:35px;">📄</div>
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${fileSize}</div>
+                    </div>
+                `;
+                uploadBox.classList.add("active");
+                toastr.success("Tải file thành công!");
+            }
+            else{
+                toastr.error("Tải file thất bại. Vui lòng thử lại.");
+            }
+            document.getElementById("btn-submit").disabled = false
+            document.getElementById("btn-submit").innerText = "Lưu sự kiện"   
+        }
+    });
+
+    // Drag & Drop
+    uploadBox.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        uploadBox.style.borderColor = "#0d6efd";
+    });
+
+    uploadBox.addEventListener("dragleave", () => {
+        uploadBox.style.borderColor = "#ced4da";
+    });
+
+    uploadBox.addEventListener("drop", (e) => {
+        e.preventDefault();
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+    });
+
+    async function chooseAvatar(){
+        document.getElementById("btn-submit").disabled = true
+        document.getElementById("btn-submit").innerText = "Đang tải ảnh..."
+        const filePath = document.getElementById('fileanhdaidientl')
+        const formData = new FormData()
+        formData.append("file", filePath.files[0])
+        var urlUpload = 'http://localhost:8080/api/public/upload-file';
+        const res = await fetch(urlUpload, {
+            method: 'POST',
+            body: formData
+        });
+        if (res.status < 300) {
+            const linkImage = await res.text();
+            document.getElementById("avatar").value = linkImage;
+            document.getElementById("btnchoosefile").style.backgroundImage = `url('${linkImage}')`;
+        }
+        document.getElementById("btn-submit").disabled = false
+        document.getElementById("btn-submit").innerText = "Lưu sự kiện"
+    }
+</script>
 </body>
+<script>
+    function getEventTemplate() {
+    return `
+<div style="font-family: Arial, sans-serif; line-height:1.6; color:#333;">
+
+    <!-- HEADER -->
+    <div style="text-align:center; padding:20px; background:linear-gradient(135deg,#0d6efd,#4e8dfd); color:white; border-radius:12px;">
+        <h2 style="margin:0;">THÔNG BÁO SỰ KIỆN</h2>
+        <p style="margin:5px 0 0;">Cập nhật thông tin chi tiết bên dưới</p>
+    </div>
+
+    <br>
+
+    <!-- THÔNG TIN CƠ BẢN -->
+    <div style="border:1px solid #e0e6ed; padding:20px; border-radius:12px;">
+        <h3 style="margin-top:0; color:#0d6efd;">1. Thông tin chung</h3>
+
+        <p><strong>📅 Thời gian:</strong> ................................................</p>
+        <p><strong>📍 Địa điểm:</strong> ................................................</p>
+        <p><strong>👥 Đối tượng:</strong> ................................................</p>
+        <p><strong>💰 Lệ phí:</strong> ................................................</p>
+    </div>
+
+    <br>
+
+    <!-- NỘI DUNG -->
+    <div style="border:1px solid #e0e6ed; padding:20px; border-radius:12px;">
+        <h3 style="margin-top:0; color:#198754;">2. Nội dung chương trình</h3>
+
+        <ul>
+            <li>Hoạt động 1</li>
+            <li>Hoạt động 2</li>
+            <li>Hoạt động 3</li>
+        </ul>
+    </div>
+
+    <br>
+
+    <!-- QUY ĐỊNH -->
+    <div style="border:1px solid #e0e6ed; padding:20px; border-radius:12px;">
+        <h3 style="margin-top:0; color:#dc3545;">3. Quy định tham gia</h3>
+
+        <ol>
+            <li>Quy định 1</li>
+            <li>Quy định 2</li>
+        </ol>
+    </div>
+
+    <br>
+
+    <!-- LIÊN HỆ -->
+    <div style="padding:15px; background:#f8f9fa; border-radius:10px;">
+        <strong>📞 Thông tin liên hệ:</strong><br>
+        Email: ................................................<br>
+        Hotline: ................................................
+    </div>
+
+</div>
+`;
+}
+</script>
 </html>

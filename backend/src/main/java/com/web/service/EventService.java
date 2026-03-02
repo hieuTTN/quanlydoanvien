@@ -5,6 +5,7 @@ import com.web.dto.EventRequest;
 import com.web.entity.Event;
 import com.web.entity.Organization;
 import com.web.enums.EventStatus;
+import com.web.exception.MessageException;
 import com.web.repository.EventRepository;
 import com.web.repository.OrganizationRepository;
 import com.web.specification.EventSpecification;
@@ -33,8 +34,10 @@ public class EventService {
 
         validate(req);
 
-        Organization org = organizationRepository.findById(req.getOrganizerId())
-                .orElseThrow(() -> new RuntimeException("Organizer not found"));
+        Organization org = null;
+        if(req.getOrganizerId() != null){
+            org = organizationRepository.findById(req.getOrganizerId()).orElse(null);
+        }
 
         Event event = new Event();
 
@@ -42,7 +45,8 @@ public class EventService {
 
         event.setOrganizer(org);
 
-        event.setStatus(determineStatus(req.getRegistrationDeadline()));
+//        event.setStatus(determineStatus(req.getRegistrationDeadline()));
+        event.setStatus(req.getStatus());
 
         return eventRepository.save(event);
     }
@@ -53,19 +57,20 @@ public class EventService {
     public Event update(Long id, EventRequest req) {
 
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new MessageException("Event not found"));
 
         validate(req);
 
-        Organization org = organizationRepository.findById(req.getOrganizerId())
-                .orElseThrow(() -> new RuntimeException("Organizer not found"));
+        Organization org = null;
+        if(req.getOrganizerId() != null){
+            org = organizationRepository.findById(req.getOrganizerId()).orElse(null);
+        }
 
         map(req, event);
-
         event.setOrganizer(org);
 
-        event.setStatus(determineStatus(req.getRegistrationDeadline()));
-
+//        event.setStatus(determineStatus(req.getRegistrationDeadline()));
+        event.setStatus(req.getStatus());
         return eventRepository.save(event);
     }
 
@@ -83,27 +88,13 @@ public class EventService {
     public Event get(Long id) {
 
         return eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new MessageException("Event not found"));
     }
 
     /*
         SEARCH + PAGINATION
      */
-    public Page<Event> search(
-            EventFilterRequest filter,
-            int page,
-            int size,
-            String sortBy,
-            String sortDir
-    ) {
-
-        Sort sort = sortDir.equalsIgnoreCase("asc") ?
-                Sort.by(sortBy).ascending()
-                :
-                Sort.by(sortBy).descending();
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-
+    public Page<Event> search(EventFilterRequest filter, Pageable pageable) {
         return eventRepository.findAll(
                 EventSpecification.filter(filter),
                 pageable
@@ -117,12 +108,14 @@ public class EventService {
 
         if (!req.getStartTime().isBefore(req.getEndTime())) {
 
-            throw new RuntimeException("startTime must be before endTime");
+            throw new MessageException("ngày bắt đâ phải trước ngày kết thúc");
         }
 
-        if (!req.getRegistrationDeadline().isBefore(req.getStartTime())) {
-
-            throw new RuntimeException("registrationDeadline must be before startTime");
+        if (req.getRegistrationDeadline().isBefore(req.getStartTime())) {
+            throw new MessageException("Ngày kết thúc đăng ký phải sau ngày bắt đầu");
+        }
+        if (req.getRegistrationDeadline().isAfter(req.getEndTime())) {
+            throw new MessageException("Ngày kết thúc đăng ký phải trước ngày kết thúc");
         }
     }
 
@@ -146,6 +139,8 @@ public class EventService {
         e.setLocation(req.getLocation());
         e.setMaxParticipants(req.getMaxParticipants());
         e.setFee(req.getFee());
+        e.setWards(req.getWards());
+        e.setAddressDetail(req.getAddressDetail());
         e.setAttachmentUrl(req.getAttachmentUrl());
         e.setBannerUrl(req.getBannerUrl());
         e.setTargetAudience(req.getTargetAudience());

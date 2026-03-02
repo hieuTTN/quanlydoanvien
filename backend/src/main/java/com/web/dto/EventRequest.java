@@ -1,5 +1,7 @@
 package com.web.dto;
 
+import com.web.entity.Wards;
+import com.web.enums.EventStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -31,4 +33,9 @@ public class EventRequest {
 
     private String targetAudience;
 
+    private String addressDetail;
+
+    private Wards wards;
+
+    private EventStatus status;
 }

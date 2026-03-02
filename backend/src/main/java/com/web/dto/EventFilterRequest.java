@@ -21,16 +21,4 @@ public class EventFilterRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime startTo;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime registrationFrom;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime registrationTo;
-
-    private Boolean upcoming;
-
-    private Boolean ongoing;
-
-    private Boolean finished;
-
 }

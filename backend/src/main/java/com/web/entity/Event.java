@@ -18,6 +18,7 @@ public class Event {
     private Long id;
 
     private String name;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -47,4 +48,17 @@ public class Event {
     // Đối tượng tham gia (Lưu dưới dạng String hoặc bảng riêng để query)
     // Ví dụ: "ALL", "HUYNH_TRUONG_LIEN_DOAN", "DOAN_SINH_CHAU"...
     private String targetAudience;
+
+    private String addressDetail;
+
+    @ManyToOne
+    private Wards wards;
+
+    public String getColor(){
+        return status.getColor();
+    }
+
+    public String getStatusName(){
+        return status.getDisplayName();
+    }
 }

@@ -78,61 +78,6 @@ public class EventSpecification {
                 );
             }
 
-            /*
-             registrationDeadline range
-             */
-            if (req.getRegistrationFrom() != null) {
-
-                predicates.add(
-                        cb.greaterThanOrEqualTo(
-                                root.get("registrationDeadline"),
-                                req.getRegistrationFrom()
-                        )
-                );
-            }
-
-            if (req.getRegistrationTo() != null) {
-
-                predicates.add(
-                        cb.lessThanOrEqualTo(
-                                root.get("registrationDeadline"),
-                                req.getRegistrationTo()
-                        )
-                );
-            }
-
-            /*
-             upcoming
-             */
-            if (Boolean.TRUE.equals(req.getUpcoming())) {
-
-                predicates.add(
-                        cb.greaterThan(root.get("startTime"), now)
-                );
-            }
-
-            /*
-             ongoing
-             */
-            if (Boolean.TRUE.equals(req.getOngoing())) {
-
-                predicates.add(
-                        cb.and(
-                                cb.lessThanOrEqualTo(root.get("startTime"), now),
-                                cb.greaterThanOrEqualTo(root.get("endTime"), now)
-                        )
-                );
-            }
-
-            /*
-             finished
-             */
-            if (Boolean.TRUE.equals(req.getFinished())) {
-
-                predicates.add(
-                        cb.lessThan(root.get("endTime"), now)
-                );
-            }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

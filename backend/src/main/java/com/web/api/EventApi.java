@@ -8,6 +8,7 @@ import com.web.enums.EventStatus;
 import com.web.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -25,7 +26,7 @@ public class EventApi {
         return eventService.create(req);
     }
 
-    @PutMapping("/admin/update/{id}")
+    @PostMapping("/admin/update/{id}")
     public Event update(@PathVariable Long id,@RequestBody EventRequest req) {
         return eventService.update(id, req);
     }
@@ -41,12 +42,8 @@ public class EventApi {
     }
 
     @PostMapping("/all/search")
-    public Page<Event> search(@RequestBody(required = false) EventFilterRequest filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "startTime") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
-        return eventService.search(filter, page, size, sortBy, sortDir );
+    public Page<Event> search(@RequestBody(required = false) EventFilterRequest filter, Pageable pageable) {
+        return eventService.search(filter, pageable );
     }
 
     @GetMapping("/all/statuses")
