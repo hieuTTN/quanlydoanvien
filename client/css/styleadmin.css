@@ -323,3 +323,45 @@ body {
         transform: scale(1);
     }
 }
+.table-admin tbody{
+    font-size: 0.9rem;
+}
+.dashboard-card {
+    border: none;
+    border-radius: 16px;
+    transition: 0.3s;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    font-size: 40px;
+    opacity: 0.2;
+    position: absolute;
+    right: 15px;
+    bottom: 10px;
+}
+
+.fade-in {
+    animation: fadeInUp 0.8s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from { transform: translateY(20px); opacity: 0 }
+    to { transform: translateY(0); opacity: 1 }
+}
+
+.chart-card {
+    border-radius: 16px;
+    border: none;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 20px;
+}

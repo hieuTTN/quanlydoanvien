@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public enum RegistrationStatus {
-    PENDING, APPROVED, REJECTED, WAITLIST
+    PENDING, APPROVED, REJECTED
 }

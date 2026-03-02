@@ -1,11 +1,14 @@
 package com.web.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.web.enums.EventStatus;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "event")
@@ -41,9 +44,6 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus status; // DRAFT, OPEN, CLOSED, CANCELLED
 
-    @ManyToOne
-    @JoinColumn(name = "organizer_id")
-    private Organization organizer; // Đơn vị tổ chức
 
     // Đối tượng tham gia (Lưu dưới dạng String hoặc bảng riêng để query)
     // Ví dụ: "ALL", "HUYNH_TRUONG_LIEN_DOAN", "DOAN_SINH_CHAU"...
@@ -52,7 +52,18 @@ public class Event {
     private String addressDetail;
 
     @ManyToOne
+    private User createdBy;
+
+    @ManyToOne
+    @JoinColumn(name = "organizer_id")
+    private Organization organizer; // Đơn vị tổ chức
+
+    @ManyToOne
     private Wards wards;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<EventUpdateBy> eventUpdateByList = new ArrayList<>();
 
     public String getColor(){
         return status.getColor();

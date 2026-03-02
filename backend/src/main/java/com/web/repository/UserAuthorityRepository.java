@@ -21,4 +21,10 @@ public interface UserAuthorityRepository extends JpaRepository<UserAuthority, Lo
     @Transactional
     @Query("delete from UserAuthority u where u.user.id = ?1")
     void deleteByUserId(Long userId);
+
+    @Query("select count(u.id) from UserAuthority u where u.authority.name = ?1")
+    Long thongKeByRole(String roleName);
+
+    @Query("select count(u.id) from UserAuthority u where u.authority.name = ?1 and month(u.user.createdDate) = ?2 and year(u.user.createdDate) = ?3 ")
+    Long countByMonthAndYear(String roleName, int i, Integer year);
 }

@@ -40,7 +40,6 @@ public class User{
 
     private String gender;
 
-//    @JsonFormat(pattern = "dd/MM/yyyy")
     private Date dob;
 
     private String idc;

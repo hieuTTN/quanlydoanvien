@@ -68,12 +68,12 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <button onclick="loadUsers(0)" class="btn btn-outline-secondary w-100"><i class="bi bi-funnel"></i> Lọc</button>
+                <button onclick="loadEvents(0)" class="btn btn-outline-secondary w-100"><i class="bi bi-funnel"></i> Lọc</button>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table class="table table-hover align-middle table-admin">
                 <thead class="table-light">
                     <tr>
                         <th style="width: 80px;">Banner</th>
@@ -90,76 +90,6 @@
                 </thead>
 
                 <tbody id="list-event">
-
-                    <!-- Example row -->
-                    <tr>
-
-                        <!-- Banner -->
-                        <td>
-                            <img src="https://via.placeholder.com/60x40"
-                                class="rounded"
-                                style="width:60px;height:40px;object-fit:cover;">
-                        </td>
-
-                        <!-- Name -->
-                        <td>
-                            <div class="fw-semibold">Trại hè Huynh Trưởng 2026</div>
-                            <small class="text-muted">ID: 12</small>
-                        </td>
-
-                        <!-- Organizer -->
-                        <td>Liên đoàn ABC</td>
-
-                        <!-- Event time -->
-                        <td>
-                            <div>05/03/2026</div>
-                            <small class="text-muted">08:00 - 17:00</small>
-                        </td>
-
-                        <!-- Registration deadline -->
-                        <td>
-                            <span class="text-danger">
-                                01/03/2026 23:59
-                            </span>
-                        </td>
-
-                        <!-- Location -->
-                        <td>
-                            <small>Nhà thờ X, Hà Nội</small>
-                        </td>
-
-                        <!-- Participants -->
-                        <td class="text-center">
-                            120
-                        </td>
-
-                        <!-- Fee -->
-                        <td class="text-center">
-                            50,000đ
-                        </td>
-
-                        <!-- Status -->
-                        <td class="text-center">
-                            <span class="badge bg-success">
-                                Đang mở đăng ký
-                            </span>
-                        </td>
-
-                        <!-- Actions -->
-                        <td class="text-end">
-
-                            <button class="btn btn-sm btn-outline-primary">
-                                Sửa
-                            </button>
-
-                            <button class="btn btn-sm btn-outline-danger">
-                                Xóa
-                            </button>
-
-                        </td>
-
-                    </tr>
-
                 </tbody>
             </table>
         </div>
@@ -168,6 +98,155 @@
             <ul id="pagination" class="pagination justify-content-end">
             </ul>
         </nav>
+    </div>
+</div>
+
+
+<!-- EVENT DETAIL MODAL -->
+<div class="modal fade" id="eventDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-event"></i>
+                    Chi tiết sự kiện
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body">
+
+                <!-- Banner -->
+                <div class="text-center mb-4">
+                    <img id="eventBanner"
+                         class="img-fluid rounded shadow-sm"
+                         style="max-height:300px; object-fit:cover;">
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- LEFT INFO -->
+                    <div class="col-md-6">
+                        <h4 id="eventName" class="fw-bold mb-3"></h4>
+
+                        <span id="eventStatus" class="badge mb-3"></span>
+
+                        <ul class="list-group list-group-flush">
+
+                            <li class="list-group-item">
+                                <strong>Thời gian:</strong>
+                                <div>
+                                    <span id="eventStart"></span>
+                                    -
+                                    <span id="eventEnd"></span>
+                                </div>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>Hạn đăng ký:</strong>
+                                <div id="eventDeadline"></div>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>Địa điểm:</strong>
+                                <div id="eventLocation"></div>
+                                <small id="eventAddressDetail" class="text-muted"></small>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>Đơn vị tổ chức:</strong>
+                                <div id="eventOrganizer"></div>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>Đối tượng tham gia:</strong>
+                                <div id="eventTarget"></div>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                    <!-- RIGHT INFO -->
+                    <div class="col-md-6">
+                        <ul class="list-group list-group-flush">
+
+                            <li class="list-group-item">
+                                <strong>Số lượng tối đa:</strong>
+                                <span id="eventMax"></span>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>Lệ phí:</strong>
+                                <span id="eventFee"></span>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>Người tạo:</strong>
+                                <span id="eventCreatedBy"></span>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>Phường/Xã:</strong>
+                                <span id="eventWard"></span>
+                            </li>
+
+                            <li class="list-group-item">
+                                <strong>File đính kèm:</strong>
+                                <div>
+                                    <a id="eventAttachment"
+                                       target="_blank"
+                                       class="btn btn-outline-primary btn-sm">
+                                        Xem file
+                                    </a>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="mt-4">
+                    <h5 class="fw-bold">Mô tả sự kiện</h5>
+                    <div id="eventDescription"
+                         class="border rounded p-3 bg-light"></div>
+                </div>
+
+                <!-- UPDATE HISTORY TABLE -->
+                <div class="mt-5">
+                    <h5 class="fw-bold mb-3">Lịch sử cập nhật</h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Người cập nhật</th>
+                                    <th>Thời gian</th>
+                                    <th>Nội dung</th>
+                                </tr>
+                            </thead>
+                            <tbody id="eventUpdateTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Đóng
+                </button>
+            </div>
+
+        </div>
     </div>
 </div>
 

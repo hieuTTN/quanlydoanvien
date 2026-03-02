@@ -3,12 +3,15 @@ package com.web.service;
 import com.web.dto.EventFilterRequest;
 import com.web.dto.EventRequest;
 import com.web.entity.Event;
+import com.web.entity.EventUpdateBy;
 import com.web.entity.Organization;
 import com.web.enums.EventStatus;
 import com.web.exception.MessageException;
 import com.web.repository.EventRepository;
+import com.web.repository.EventUpdateByRepository;
 import com.web.repository.OrganizationRepository;
 import com.web.specification.EventSpecification;
+import com.web.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Service
@@ -27,9 +31,16 @@ public class EventService {
     @Autowired
     private OrganizationRepository organizationRepository;
 
+    @Autowired
+    private EventUpdateByRepository eventUpdateByRepository;
+
+    @Autowired
+    private UserUtils userUtils;
+
     /*
        CREATE
     */
+    @Transactional
     public Event create(EventRequest req) {
 
         validate(req);
@@ -45,6 +56,8 @@ public class EventService {
 
         event.setOrganizer(org);
 
+        event.setCreatedBy(userUtils.getUserWithAuthority());
+
 //        event.setStatus(determineStatus(req.getRegistrationDeadline()));
         event.setStatus(req.getStatus());
 
@@ -54,6 +67,7 @@ public class EventService {
     /*
         UPDATE
      */
+    @Transactional
     public Event update(Long id, EventRequest req) {
 
         Event event = eventRepository.findById(id)
@@ -71,6 +85,11 @@ public class EventService {
 
 //        event.setStatus(determineStatus(req.getRegistrationDeadline()));
         event.setStatus(req.getStatus());
+        EventUpdateBy eventUpdateBy = new EventUpdateBy();
+        eventUpdateBy.setEvent(event);
+        eventUpdateBy.setUser(userUtils.getUserWithAuthority());
+        eventUpdateBy.setCreatedDate(LocalDateTime.now());
+        eventUpdateByRepository.save(eventUpdateBy);
         return eventRepository.save(event);
     }
 
@@ -95,8 +114,9 @@ public class EventService {
         SEARCH + PAGINATION
      */
     public Page<Event> search(EventFilterRequest filter, Pageable pageable) {
+        EventSpecification eventSpecification = new EventSpecification(filter);
         return eventRepository.findAll(
-                EventSpecification.filter(filter),
+                eventSpecification,
                 pageable
         );
     }
