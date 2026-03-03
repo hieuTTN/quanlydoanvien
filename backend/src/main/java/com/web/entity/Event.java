@@ -35,6 +35,8 @@ public class Event {
 
     private Integer maxParticipants;
 
+    private Integer currentPeople = 0;
+
     private Double fee; // Optional
 
     private String attachmentUrl; // Link tới file kế hoạch/form
@@ -50,6 +52,8 @@ public class Event {
     private String targetAudience;
 
     private String addressDetail;
+
+    private Integer numView = 0;
 
     @ManyToOne
     private User createdBy;

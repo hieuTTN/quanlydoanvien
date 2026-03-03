@@ -34,7 +34,7 @@ async function login() {
             listButton += `<a href="/lien-doan/index.html" class="role-btn btn-lien-doan">Quản lý liên đoàn</a>`;
         }
         if (roleNames.includes("ROLE_DOAN_SINH")) {
-            listButton += `<a href="/doan-sinh/index.html" class="role-btn btn-doan-sinh">Trang cá nhân đoàn sinh</a>`;
+            listButton += `<a href="/doanvien/index.html" class="role-btn btn-doan-sinh">Trang cá nhân đoàn sinh</a>`;
         }
         // Hiển thị các nút chức năng dựa trên vai trò của người dùng
         Swal.fire({
@@ -57,5 +57,57 @@ async function login() {
     else{
         toastr.warning(result.defaultMessage);
          document.getElementById('message').innerText = result.defaultMessage;
+    }
+}
+
+async function forgorPassword() {
+    var email = document.getElementById("email").value
+    var url = 'http://localhost:8080/api/user/public/quen-mat-khau?email=' + email
+    const res = await fetch(url, {
+        method: 'POST'
+    });
+    if (res.status < 300) {
+        swal({
+                title: "",
+                text: "Kiểm tra email của bạn",
+                type: "success"
+            },
+            function() {
+                window.location.replace("login.html")
+            });
+    }
+    if (res.status == 417) {
+        var result = await res.json()
+        toastr.warning(result.defaultMessage);
+    }
+}
+
+async function datLaiMatKhau() {
+    var password = document.getElementById("newPassword").value
+    var repassword = document.getElementById("confirmPassword").value
+    if(password != repassword){
+        Swal("Lỗi", "Mật khẩu không trùng khớp", "error");
+        return;
+    }
+    var uls = new URL(document.URL)
+    var email = uls.searchParams.get("email");
+    var key = uls.searchParams.get("key");
+    var url = 'http://localhost:8080/api/user/public/dat-lai-mat-khau?email=' + email+'&key='+key+'&password='+password
+    const res = await fetch(url, {
+        method: 'POST'
+    });
+    if (res.status < 300) {
+        swal({
+                title: "",
+                text: "Đặt lại mật khẩu thành công",
+                type: "success"
+            },
+            function() {
+                window.location.replace("login.html")
+            });
+    }
+    if (res.status == 417) {
+        var result = await res.json()
+        toastr.warning(result.defaultMessage);
     }
 }

@@ -14,4 +14,7 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
     List<EventRegistration> dkSuKienMoiNhat();
 
     Long countEventRegistrationByStatus(RegistrationStatus status);
+
+    @Query("select e from EventRegistration e where e.user.id = ?1 and e.event.id = ?2")
+    EventRegistration countByUserAndEvent(Long userId, Long eventId);
 }

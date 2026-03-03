@@ -156,6 +156,11 @@ public class UserApi {
         return userService.findById(id);
     }
 
+    @GetMapping("/all/user-logged")
+    public User logged() {
+        return userUtils.getUserWithAuthority();
+    }
+
     @PostMapping("/admin/import")
     public ImportUserResult importUsers(
 

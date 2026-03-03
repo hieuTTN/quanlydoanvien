@@ -9,8 +9,8 @@ import java.util.Properties;
 
 @Configuration
 public class MailSenderConfig {
-    final static String username = "mem.eeglab.seee@gmail.com";
-    final static String password = "gxyfltffxpehewka";
+    final static String username = "dev002102@gmail.com";
+    final static String password = "vlpenjdvmhzajkjc";
 
     @Bean
     public JavaMailSender getJavaMailSender() {
@@ -26,6 +26,7 @@ public class MailSenderConfig {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.debug", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         return mailSender;
     }

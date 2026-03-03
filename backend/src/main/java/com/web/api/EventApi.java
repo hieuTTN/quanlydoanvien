@@ -46,6 +46,11 @@ public class EventApi {
         return eventService.search(filter, pageable );
     }
 
+    @GetMapping("/all/get-by-param")
+    public Page<Event> search(@RequestParam(required = false) String search, Pageable pageable) {
+        return eventService.filterByParam(search == null?"%%":"%"+search+"%", pageable );
+    }
+
     @GetMapping("/all/statuses")
     public List<EventStatusDto> getStatuses() {
         return Arrays.stream(EventStatus.values())

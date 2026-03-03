@@ -204,7 +204,7 @@ public class UserService {
         mailService.sendEmail(email, "Đặt lại mật khẩu",
                 "Chúng tôi đã tạo một mật khẩu mới từ yêu cầu của bạn<br>" +
                 "Hãy lick vào bên dưới để đặt lại mật khẩu mới của bạn<br><br>" +
-                "<a href='http://memeeglab.com/datlaimatkhau?email="+email+"&key="+random+"' style=\"background-color: #2f5fad; padding: 10px; color: #fff; font-size: 18px; font-weight: bold;\">Đặt lại mật khẩu</a>",false, true);
+                "<a href='http://127.0.0.1:5500/datlaimatkhau.html?email="+email+"&key="+random+"' style=\"background-color: #2f5fad; padding: 10px; color: #fff; font-size: 18px; font-weight: bold;\">Đặt lại mật khẩu</a>",false, true);
 
     }
 

@@ -16,21 +16,19 @@ public class EventRegistration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String email;
+
+    private String fullName;
+
+    private String phone;
+
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
 
     @ManyToOne
     @JoinColumn(name = "registrant_id")
-    private User registrant; // Người thực hiện thao tác đăng ký
-
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private User member; // Người thực sự tham gia (Đoàn sinh hoặc Huynh trưởng)
-
-    @ManyToOne
-    @JoinColumn(name = "organization_id")
-    private Organization organization; // Đăng ký cho đơn vị nào (nếu có)
+    private User user; // Người thực hiện thao tác đăng ký
 
     private LocalDateTime registrationTime;
 

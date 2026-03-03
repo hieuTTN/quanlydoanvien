@@ -55,6 +55,8 @@ public class EventService {
         map(req, event);
 
         event.setOrganizer(org);
+        event.setNumView(0);
+        event.setCurrentPeople(0);
 
         event.setCreatedBy(userUtils.getUserWithAuthority());
 
@@ -106,8 +108,11 @@ public class EventService {
      */
     public Event get(Long id) {
 
-        return eventRepository.findById(id)
+        Event e = eventRepository.findById(id)
                 .orElseThrow(() -> new MessageException("Event not found"));
+        e.setNumView(e.getNumView() + 1);
+        eventRepository.save(e);
+        return e;
     }
 
     /*
@@ -119,6 +124,11 @@ public class EventService {
                 eventSpecification,
                 pageable
         );
+    }
+
+    public Page<Event> filterByParam(String search, Pageable pageable) {
+        Page<Event> page = eventRepository.filterByParam(search, pageable);
+        return page;
     }
 
     /*

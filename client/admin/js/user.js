@@ -510,7 +510,7 @@ async function saveUser() {
     else if(res.status == 417){
         var result = await res.json();
         console.log(result);
-        
+        swal("Thông báo", result.defaultMessage || "Có lỗi xảy ra", "error");
     }
     else {
         var result = await res.json();
