@@ -306,6 +306,9 @@ async function initData(){
     })
     .then(r=>r.json());
 
+    console.log(ALL_ROLES);
+    
+
     ALL_ORGANIZATIONS = await fetch("http://localhost:8080/api/organizations/all/find-all-list", {
         method: "GET",
         headers: new Headers({

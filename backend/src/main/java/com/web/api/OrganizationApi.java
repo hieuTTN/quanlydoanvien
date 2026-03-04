@@ -38,6 +38,11 @@ public class OrganizationApi {
         return service.findByType(organizationType);
     }
 
+    @GetMapping("/all/find-by-user")
+    public List<OrganizationDto> findAllByUser(){
+        return service.findOrganizationByUser();
+    }
+
     @GetMapping("/all/types")
     public List<OrganizationTypeDto> allType(){
         return service.getOrganizationTypes();

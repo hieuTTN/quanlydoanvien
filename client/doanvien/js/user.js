@@ -54,8 +54,10 @@ async function loadInitInfor() {
     document.getElementById('birthday').value = result.dob;
     if(result.wards != null) {
         document.getElementById('tinh').value = result.wards.provinceCode;
+        $("#tinh").val(result.wards.provinceCode).change()
         await loadHuyenOnchange();
         document.getElementById('xa').value = result.wards.code;
+        $("#xa").val(result.wards.code).change()
     }
 }
 

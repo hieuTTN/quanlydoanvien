@@ -5,10 +5,14 @@ import com.web.dto.OrganizationDto;
 import com.web.dto.OrganizationTypeDto;
 import com.web.dto.OrganizationUpdateRequest;
 import com.web.entity.Organization;
+import com.web.entity.User;
+import com.web.entity.UserAuthority;
 import com.web.enums.LogLevel;
 import com.web.enums.OrganizationType;
 import com.web.exception.MessageException;
 import com.web.repository.OrganizationRepository;
+import com.web.repository.UserAuthorityRepository;
+import com.web.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,12 @@ public class OrganizationService {
 
     @Autowired
     private AuditLogService auditLogService;
+
+    @Autowired
+    private UserUtils userUtils;
+
+    @Autowired
+    private UserAuthorityRepository userAuthorityRepository;
 
     public List<OrganizationTypeDto> getOrganizationTypes() {
         List<OrganizationTypeDto> list = new ArrayList<>();
@@ -361,6 +369,61 @@ public class OrganizationService {
             }
 
             temp = temp.getParent();
+        }
+    }
+
+    @Transactional
+    public List<OrganizationDto> findOrganizationByUser() {
+
+        User user = userUtils.getUserWithAuthority();
+
+        // 1. Lấy danh sách UserAuthority
+        List<UserAuthority> authorities = user.getUserAuthorities();
+
+        // 2. Lấy Organization gốc của user
+        List<Organization> rootOrgs = authorities.stream()
+                .map(UserAuthority::getOrganization)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        // 3. Lấy toàn bộ organization con (đệ quy)
+        List<Organization> allOrgs = getAllChildren(rootOrgs);
+
+        // 4. Remove trùng (vì có thể nhiều role chung 1 nhánh)
+        List<Organization> distinctOrgs = allOrgs.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                Organization::getId,
+                                o -> o,
+                                (o1, o2) -> o1
+                        ),
+                        m -> new ArrayList<>(m.values())
+                ));
+
+        // 5. Map sang DTO
+        return distinctOrgs.stream()
+                .map(this::toDto)
+                .sorted(Comparator.comparingInt(OrganizationDto::getTypeLevel))
+                .collect(Collectors.toList());
+    }
+
+    public List<Organization> getAllChildren(List<Organization> roots) {
+        List<Organization> result = new ArrayList<>();
+
+        for (Organization org : roots) {
+            collectChildren(org, result);
+        }
+
+        return result;
+    }
+
+    private void collectChildren(Organization org, List<Organization> result) {
+        result.add(org);
+
+        if (org.getChildren() != null && !org.getChildren().isEmpty()) {
+            for (Organization child : org.getChildren()) {
+                collectChildren(child, result);
+            }
         }
     }
 }

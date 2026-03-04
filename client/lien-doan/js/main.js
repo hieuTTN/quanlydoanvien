@@ -20,13 +20,13 @@ $( document ).ready(function() {
 
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/index.html" data-url-header="index.html"><i class="bi bi-house"></i> Trang chủ</a>
+                    <a class="nav-link" href="/index.html" data-url-header="index.html"><i class="bi bi-house"></i> Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="sukien.html" data-url-header="sukien.html"><i class="bi bi-calendar-event"></i> Sự kiện</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-people"></i> Đơn vị</a>
+                    <a class="nav-link" href="#"><i class="bi bi-people"></i> Quản lý liên đoàn</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#"><i class="bi bi-award" ></i> Thành tích</a>
@@ -107,9 +107,9 @@ function loadSideBar() {
                 </a>
             </li>
             <li>
-                <a href="my-regis-event.html" data-url="my-regis-event.html" class="account-menu-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    Sự kiện đã đăng ký
+                <a href="doanvien.html" data-url="doanvien.html" class="account-menu-item">
+                    <i class="fas fa-users"></i>
+                    Quản lý đoàn viên
                 </a>
             </li>
             <li>
@@ -125,7 +125,7 @@ function loadSideBar() {
                 </a>
             </li>
             <li>
-                <a href="#" onclick="logout()"  class="account-menu-item">
+                <a href="#" onclick="logout()" class="account-menu-item">
                     <i class="fa fa-sign-out" aria-hidden="true"></i>
                     Đăng xuất
                 </a>

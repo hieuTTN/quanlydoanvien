@@ -33,6 +33,9 @@ async function login() {
         if (roleNames.includes("ROLE_LIEN_DOAN_TRUONG")) {
             listButton += `<a href="/lien-doan/index.html" class="role-btn btn-lien-doan">Quản lý liên đoàn</a>`;
         }
+        if (roleNames.includes("ROLE_DOAN_TRUONG")) {
+            listButton += `<a href="/doan/index.html" class="role-btn btn-lien-doan">Quản lý đoàn</a>`;
+        }
         if (roleNames.includes("ROLE_DOAN_SINH")) {
             listButton += `<a href="/doanvien/index.html" class="role-btn btn-doan-sinh">Trang cá nhân đoàn sinh</a>`;
         }

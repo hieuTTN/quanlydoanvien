@@ -24,5 +24,10 @@ public class AuthorityApi {
         return authotityService.findAll();
     }
 
+    @GetMapping("/all/find-by-user")
+    public List<Authority> findByUser(){
+        return authotityService.findByUser();
+    }
+
 
 }

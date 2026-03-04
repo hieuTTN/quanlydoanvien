@@ -1,0 +1,360 @@
+async function changePassword() {
+    var token = localStorage.getItem("token");
+    var oldpass = document.getElementById("oldpass").value
+    var newpass = document.getElementById("newpass").value
+    var renewpass = document.getElementById("renewpass").value
+    var url = 'http://localhost:8080/api/user/all/change-password';
+    if (newpass != renewpass) {
+        swal("Lỗi", "Mật khẩu mới không trùng khớp", "error");
+        return;
+    }
+    var passw = {
+        "oldPass": oldpass,
+        "newPass": newpass
+    }
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(passw)
+    });
+    if (response.status < 300) {
+        swal({
+                title: "Thông báo",
+                text: "cập nhật mật khẩu thành công, hãy đăng nhập lại",
+                type: "success"
+            },
+            function() {
+            });
+    }
+    if (response.status == 417) {
+        var result = await response.json()
+        swal("Lỗi", result.defaultMessage, "error");
+    }
+}
+
+async function loadInitInfor() {
+    const response = await fetch(`http://localhost:8080/api/user/all/user-logged`, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token
+        })
+    });
+    var result = await response.json();
+    if(result.avatar != null && result.avatar != '') {
+        document.getElementById('avatar').src = result.avatar;
+    }
+    document.getElementById('fullname').value = result.fullName;
+    document.getElementById('phone').value = result.phone;
+    document.getElementById('gender').value = result.gender;
+    document.getElementById('address').value = result.address;
+    document.getElementById('avatarUrl').value = result.avatar;
+    document.getElementById('birthday').value = result.dob;
+    if(result.wards != null) {
+        document.getElementById('tinh').value = result.wards.provinceCode;
+        $("#tinh").val(result.wards.provinceCode).change()
+        await loadHuyenOnchange();
+        document.getElementById('xa').value = result.wards.code;
+        $("#xa").val(result.wards.code).change()
+    }
+}
+
+async function updateInfor() {
+    var user = {
+        fullName: document.getElementById("fullname").value,
+        phone: document.getElementById("phone").value,
+        gender: document.getElementById("gender").value,
+        dob: document.getElementById("birthday").value,
+        address: document.getElementById("address").value,     
+        avatar: document.getElementById("avatarUrl").value,
+        wards: {
+            code: document.getElementById("xa").value
+        },
+    }
+    const res = await fetch('http://localhost:8080/api/user/all/update-infor', {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(user)
+    });
+    if (res.status < 300) {
+        swal({
+            title: "Thông báo",
+            text: "cập nhật thông tin thành công!",
+            type: "success"
+        },
+        function() {
+            window.location.reload();
+        });
+    } 
+    else if(res.status == 417){
+        var result = await res.json();
+        console.log(result);
+        swal("Thông báo", result.defaultMessage || "Có lỗi xảy ra", "error");
+    }
+    else {
+        var result = await res.json();
+        console.log(result.defaultMessage);
+        
+        if(result && result.message){
+            toastr.error(result.message);
+        } 
+        else if(result && result.defaultMessage){
+            toastr.error(result.defaultMessage);
+        }
+        else {
+            toastr.error("Cập nhật thông tin thất bại");
+        }
+    }
+
+}
+
+async function loadToChuc() {
+    const response = await fetch(`http://localhost:8080/api/user/all/user-logged`, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token
+        })
+    });
+    var result = await response.json();
+    var authos = result.userAuthorities;
+    var main = '';
+    for(i=0; i< authos.length; i++){
+        if(authos[i].organization.type = 'DOAN'){
+            main += `<option value="${authos[i].organization.id}">${authos[i].organization.name}</option>`
+        }
+    }
+    document.getElementById("organization").innerHTML = main;
+}
+
+var size = 10;
+
+async function loadUsers(page) {
+    var search = document.getElementById("search").value
+    var gender = document.getElementById("gender").value
+    var organization = document.getElementById("organization").value
+    var url = 'http://localhost:8080/api/user/all/filter?page=' + page + '&size=' + size + '&keyword=' + search;
+    if (gender) {
+        url += '&gender=' + gender;
+    }
+    if (organization) {
+        url += '&organizationId=' + organization;
+    }
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+        }),
+    });
+    var result = await response.json();
+    var list = result.content;
+    var totalPage = result.totalPages;
+    if(list.length == 0){
+        document.getElementById("list-user").innerHTML = '<tr><td colspan="5" class="text-center">Không có dữ liệu</td></tr>';
+        document.getElementById("pagination").innerHTML = '';
+        return;
+    }
+    var main = '';
+    for (i = 0; i < list.length; i++) {
+        main += ` <tr id="user-row-${list[i].id}">
+                    <td><img src="${list[i].avatar || '/image/default-avatar.jpg'}" class="rounded-circle" width="35"></td>
+                    <td>${list[i].fullName}</td>
+                    <td>${list[i].email}</td>
+                    <td>${list[i].address}, ${list[i].wards == null?'':list[i].wards.name +', '+list[i].wards.provinceName}</td>
+                    <td id="status-${list[i].id}"><span class="badge bg-${list[i].actived === true ? 'success' : 'danger'}">${list[i].actived === true ? 'Hoạt động' : 'Đã khóa'}</span></td>
+                    <td class="text-end">
+                        <a href="add-user.html?id=${list[i].id}" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
+                        <button onclick="deleteUser(${list[i].id})" class="btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i></button>
+                    </td>
+                </tr>`
+    }
+    document.getElementById("list-user").innerHTML = main
+    var mainpage = ''
+    for (i = 1; i <= totalPage; i++) {
+        mainpage += `<li onclick="loadUsers(${(Number(i) - 1)})" class="page-item"><a class="page-link" href="#">${i}</a></li>`
+    }
+    document.getElementById("pagination").innerHTML = mainpage
+}
+
+async function chooseAvatar(){
+    document.getElementById("btn-submit").disabled = true
+    document.getElementById("btn-submit").innerText = "Đang tải ảnh..."
+    const filePath = document.getElementById('fileanhdaidientl')
+    const formData = new FormData()
+    formData.append("file", filePath.files[0])
+    var urlUpload = 'http://localhost:8080/api/public/upload-file';
+    const res = await fetch(urlUpload, {
+        method: 'POST',
+        body: formData
+    });
+    if (res.status < 300) {
+        const linkImage = await res.text();
+        document.getElementById("avatar").value = linkImage;
+        document.getElementById("btnchoosefile").style.backgroundImage = `url('${linkImage}')`;
+    }
+    document.getElementById("btn-submit").disabled = false
+    document.getElementById("btn-submit").innerText = "Lưu User"
+}
+
+async function saveUser() {
+    var uls = new URL(document.URL)
+    var id = uls.searchParams.get("id");
+    var author = [];
+    var dto = {
+        authorityName:"ROLE_DOAN_SINH",
+        organizationId:document.getElementById("organization").value,
+        isHead:false,
+        isDefault:false
+    }
+    author.push(dto)
+    var user = {
+        id: id,
+        fullName: document.getElementById("fullName").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        idc: document.getElementById("idc").value,
+        gender: document.getElementById("gender").value,
+        password: document.getElementById("password").value,
+        dob: document.getElementById("dob").value,
+        address: document.getElementById("stressName").value,     
+        actived: document.getElementById("actived").checked,     
+        avatar: document.getElementById("avatar").value,
+        wardCode: document.getElementById("xa").value,
+        authorities: author
+    }
+    const res = await fetch('http://localhost:8080/api/user/all/create-update', {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(user)
+    });
+    if (res.status < 300) {
+        swal({
+            title: "Thông báo",
+            text: "thêm/sửa user thành công!",
+            type: "success"
+        },
+        function() {
+            window.location.replace('doanvien.html')
+        });
+    } 
+    else if(res.status == 417){
+        var result = await res.json();
+        console.log(result);
+        swal("Thông báo", result.defaultMessage || "Có lỗi xảy ra", "error");
+    }
+    else {
+        var result = await res.json();
+        console.log(result.defaultMessage);
+        
+        if(result && result.message){
+            toastr.error(result.message);
+        } 
+        else if(result && result.defaultMessage){
+            toastr.error(result.defaultMessage);
+        }
+        else {
+            toastr.error("Tạo user thất bại");
+        }
+    }
+
+}
+
+async function loadAUser() {
+    var id = window.location.search.split('=')[1];
+    if (id != null) {
+        var url = `http://localhost:8080/api/user/all/${id}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: new Headers({
+                'Authorization': 'Bearer ' + token
+            })
+        });
+        var result = await response.json();
+        
+        document.getElementById("fullName").value = result.fullName
+        document.getElementById("email").value = result.email
+        document.getElementById("phone").value = result.phone
+        document.getElementById("idc").value = result.idc
+        document.getElementById("gender").value = result.gender
+        document.getElementById("dob").value = result.dob
+        document.getElementById("stressName").value = result.address
+        document.getElementById("actived").checked = result.actived
+        document.getElementById("avatar").value = result.avatar
+        if(result.avatar){
+            document.getElementById("btnchoosefile").style.backgroundImage = `url('${result.avatar}')`;
+        }
+        try {
+            $("#tinh").val(result.wards.provinceCode).trigger('change');
+            await loadHuyenOnchange();
+            setTimeout(() => {
+                $("#xa").val(result.wards.code).trigger('change');
+            }, 500);
+        } catch (error) {
+            console.error("Lỗi khi load địa chỉ:", error);
+        }
+        var authos = result.userAuthorities;
+        var authorityRows = document.querySelectorAll("#authorityTable tr");
+        for (i = 0; i < authos.length; i++) {
+            addAuthorityRow();
+        }
+        authorityRows = document.querySelectorAll("#authorityTable tr");
+        
+        for (i = 0; i < authos.length; i++) {
+            var a = authos[i];
+            var row = authorityRows[i];
+            row.querySelector(".role-select").value = a.authority.name;
+            row.querySelector(".role-select").dispatchEvent(new Event('change'));
+            row.querySelector(".org-select").value = a.organization ? a.organization.id : "";
+            row.querySelector(".isHead").checked = a.isHead;
+            row.querySelector(".isDefault").checked = a.isDefault;
+        }
+    }
+}
+
+async function deleteUser(id) {
+    // 1. Hiển thị thông báo xác nhận trước khi làm gì khác
+    swal({
+        title: "Bạn có chắc chắn muốn xóa đoàn viên này?",
+        text: "Hành động này không thể hoàn tác!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Xóa",
+        cancelButtonText: "Hủy",
+        closeOnConfirm: false // Chờ phản hồi từ server mới đóng alert
+    },
+    async function(isConfirm) {
+        // Nếu người dùng chọn "Xóa"
+        if (isConfirm) {
+            var url = 'http://localhost:8080/api/user/all/delete?id=' + id;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: new Headers({
+                        'Authorization': 'Bearer ' + token
+                    })
+                });
+
+                if (response.status < 300) {
+                    swal("Đã xóa!", "Đoàn viên đã được xóa khỏi hệ thống.", "success");
+                    document.getElementById(`user-row-${id}`).remove();
+                } else if (response.status == exceptionCode) {
+                    var result = await response.json();
+                    swal("Lỗi!", result.defaultMessage, "error");
+                } else {
+                    swal("Thất bại!", "Có lỗi xảy ra trong quá trình xóa.", "error");
+                }
+            } catch (error) {
+                swal("Lỗi!", "Không thể kết nối đến máy chủ.", "error");
+            }
+        }
+    });
+}

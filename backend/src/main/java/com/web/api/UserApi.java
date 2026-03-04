@@ -83,6 +83,12 @@ public class UserApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping("/all/delete")
+    public ResponseEntity<?> deleteByAll(@RequestParam("id") Long id){
+        userService.delete(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @PostMapping("/public/quen-mat-khau")
     public ResponseEntity<?> quenMatKhau(@RequestParam String email) throws URISyntaxException {
         userService.guiYeuCauQuenMatKhau(email);
@@ -145,14 +151,30 @@ public class UserApi {
         return userService.save(dto);
     }
 
+    @PostMapping("/all/create-update")
+    public User createOrUpdateByAll(@RequestBody UserDTO dto) {
+        return userService.save(dto);
+    }
+
     @GetMapping("/admin/search")
     public Page<User> searchUsers(@RequestParam(required = false) String keyword, @RequestParam(required = false) String authority,
             @RequestParam(required = false) Long organizationId, @RequestParam(required = false) Boolean actived,Pageable pageable) {
         return userService.searchUsers(keyword,authority,organizationId,actived,pageable);
     }
 
+    @GetMapping("/all/filter")
+    public Page<User> searchByAll(@RequestParam(required = false) String keyword, @RequestParam(required = false) String gender,
+             @RequestParam Long organizationId, Pageable pageable) {
+        return userService.searchUsersByAll(keyword,gender,organizationId,pageable);
+    }
+
     @GetMapping("/admin/{id}")
     public User getById(@PathVariable Long id) {
+        return userService.findById(id);
+    }
+
+    @GetMapping("/all/{id}")
+    public User getByIdByAll(@PathVariable Long id) {
         return userService.findById(id);
     }
 
@@ -195,4 +217,5 @@ public class UserApi {
         User user = userService.updateMyInfor(userUpdate);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+
 }

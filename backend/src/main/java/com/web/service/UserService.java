@@ -536,6 +536,40 @@ public class UserService {
 
     }
 
+    public Page<User> searchUsersByAll(String keyword, String gender, Long organizationId, Pageable pageable) {
+        return userRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            query.distinct(true);
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String pattern = "%" + keyword.toLowerCase().trim() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("email")), pattern),
+                        cb.like(cb.lower(root.get("fullName")), pattern),
+                        cb.like(cb.lower(root.get("phone")), pattern),
+                        cb.like(cb.lower(root.get("idc")), pattern)
+                ));
+            }
+            if (gender != null) {predicates.add(cb.equal(root.get("gender"), gender));}
+
+            if (organizationId != null) {
+                Join<User, UserAuthority> uaJoin =
+                        root.join("userAuthorities", JoinType.INNER);
+                predicates.add(
+                        cb.equal(
+                                uaJoin.get("organization").get("id"),
+                                organizationId
+                        )
+                );
+
+            }
+
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+
+        }, pageable);
+
+    }
+
     public User updateMyInfor(UserUpdate userUpdate) {
         User user = userUtils.getUserWithAuthority();
         user.setGender(userUpdate.getGender());
@@ -547,4 +581,6 @@ public class UserService {
         user.setAddress(userUpdate.getAddress());
         return userRepository.save(user);
     }
+
+
 }

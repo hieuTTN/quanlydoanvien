@@ -441,3 +441,134 @@ a {
     object-fit: cover;   /* Cắt ảnh vừa khung, không méo */
     border-radius: 50%;
 }
+
+/* ===== HERO ===== */
+.hero{
+    height:100vh;
+    background: linear-gradient(135deg,#0d6efd,#4dabf7);
+    color:white;
+    display:flex;
+    align-items:center;
+    position:relative;
+    overflow:hidden;
+}
+
+.hero::after{
+    content:'';
+    position:absolute;
+    width:600px;
+    height:600px;
+    background:rgba(255,255,255,0.15);
+    border-radius:50%;
+    top:-200px;
+    right:-200px;
+    animation: float 8s infinite ease-in-out;
+}
+
+@keyframes float{
+    0%{transform:translateY(0);}
+    50%{transform:translateY(30px);}
+    100%{transform:translateY(0);}
+}
+
+.hero h1{
+    font-size:50px;
+    font-weight:800;
+}
+
+.hero-btn{
+    border-radius:30px;
+    padding:10px 30px;
+    font-weight:600;
+}
+
+/* ===== GLASS CARD ===== */
+.glass-card{
+    background:rgba(255,255,255,0.6);
+    backdrop-filter:blur(10px);
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    transition:0.4s;
+}
+
+.glass-card:hover{
+    transform:translateY(-8px);
+}
+
+/* ===== STATS ===== */
+.stats-icon{
+    font-size:35px;
+    color:#0d6efd;
+}
+
+/* ===== EVENT CARD ===== */
+.event-card img{
+    height:200px;
+    object-fit:cover;
+    border-top-left-radius:20px;
+    border-top-right-radius:20px;
+}
+
+.event-card{
+    overflow:hidden;
+}
+
+/* ===== TIMELINE ===== */
+.timeline{
+    border-left:3px solid #0d6efd;
+    padding-left:20px;
+}
+
+.timeline-item{
+    margin-bottom:25px;
+    position:relative;
+}
+
+.timeline-item::before{
+    content:'';
+    width:14px;
+    height:14px;
+    background:#0d6efd;
+    border-radius:50%;
+    position:absolute;
+    left:-28px;
+    top:5px;
+}
+
+/* ===== FOOTER ===== */
+.footer{
+    background:#0d6efd;
+    color:white;
+    padding:40px 0;
+}
+
+/* ===== SCROLL ANIMATION ===== */
+.fade-up{
+    opacity:0;
+    transform:translateY(40px);
+    transition:1s;
+}
+
+.fade-up.show{
+    opacity:1;
+    transform:translateY(0);
+}
+.glass-card img{
+    width: 100%;
+}
+table tr{
+    font-size: 0.9rem;
+}
+table i{
+}
+.btnchonanh{
+    /* width: 100%; */
+    border: none;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    color: #fff;
+    font-size: 1.2rem;
+}
+#btnchoosefile{
+    background-size: 100%;
+}

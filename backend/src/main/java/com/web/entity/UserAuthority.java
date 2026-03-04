@@ -2,6 +2,7 @@ package com.web.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.web.dto.OrganizationDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,4 +37,5 @@ public class UserAuthority {
 
     @Column(name = "is_default")
     private Boolean isDefault = false; // Đánh dấu vai trò mặc định khi đăng nhập
+
 }
