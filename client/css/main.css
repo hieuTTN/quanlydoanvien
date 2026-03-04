@@ -306,3 +306,138 @@ a {
     padding: 10px;
     font-weight: 600;
 }
+
+
+/* Layout spacing do navbar fixed-top */
+.account-layout {
+    margin-top: 90px;
+}
+
+/* Sidebar */
+.account-sidebar {
+    position: sticky;
+    top: 100px; /* cách navbar một chút */
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    padding: 25px 0;
+    animation: accountFadeIn 0.4s ease;
+}
+
+/* Avatar */
+.account-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Menu */
+.account-menu {
+    list-style: none;
+    padding: 20px 0 0;
+    margin: 0;
+}
+
+.account-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    border-radius: 8px;
+}
+
+.account-menu-item:hover {
+    background: #f5f6ff;
+    padding-left: 25px;
+}
+
+.account-active {
+    background: #f0f2ff;
+    color: #4f46e5 !important;
+}
+
+/* Content */
+.account-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    min-height: 800px;
+}
+
+/* Animation */
+@keyframes accountFadeIn {
+    from {opacity:0; transform:translateY(10px);}
+    to {opacity:1; transform:translateY(0);}
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+
+    .account-sidebar {
+        position: relative;
+        top: 0;
+        margin-bottom: 20px;
+    }
+
+}
+
+/* ===== Page Header ===== */
+.account-page-header {
+    margin-bottom: 25px;
+}
+
+.account-page-title {
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.account-page-desc {
+    color: #777;
+    font-size: 14px;
+}
+
+/* ===== Card chung ===== */
+.account-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    padding: 30px;
+    margin-bottom: 25px;
+    animation: accountFadeIn 0.3s ease;
+}
+
+/* ===== Button ===== */
+.account-btn {
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* ===== Table style ===== */
+.account-table thead {
+    background: #f8f9fa;
+}
+
+.account-table tbody tr:hover {
+    background: #f9fafc;
+}
+
+/* ===== Badge nhẹ ===== */
+.account-badge {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+.img-circle {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;   /* Cắt ảnh vừa khung, không méo */
+    border-radius: 50%;
+}

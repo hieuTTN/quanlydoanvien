@@ -117,9 +117,11 @@ public class UserService {
             TokenDto tokenDto = new TokenDto();
             tokenDto.setToken(token);
             tokenDto.setUser(users.get());
+            auditLogService.saveByEmail("Đăng nhập thành công",LogLevel.INFO,email);
             return tokenDto;
         }
         else{
+            auditLogService.saveByEmail("Đăng nhập thất bại",LogLevel.WARNING,email);
             throw new MessageException("Mật khẩu không chính xác", 400);
         }
     }
@@ -205,7 +207,7 @@ public class UserService {
                 "Chúng tôi đã tạo một mật khẩu mới từ yêu cầu của bạn<br>" +
                 "Hãy lick vào bên dưới để đặt lại mật khẩu mới của bạn<br><br>" +
                 "<a href='http://127.0.0.1:5500/datlaimatkhau.html?email="+email+"&key="+random+"' style=\"background-color: #2f5fad; padding: 10px; color: #fff; font-size: 18px; font-weight: bold;\">Đặt lại mật khẩu</a>",false, true);
-
+        auditLogService.saveByEmail("Gửi yêu cầu quên mật khẩu",LogLevel.WARNING,email);
     }
 
     public void xacNhanDatLaiMatKhau(String email, String password, String key) {
@@ -214,6 +216,7 @@ public class UserService {
         if(user.get().getRememberKey().equals(key)){
             user.get().setPassword(passwordEncoder.encode(password));
             userRepository.save(user.get());
+            auditLogService.saveByEmail("Đặt lại mật khẩu mới",LogLevel.INFO,email);
         }
         else{
             throw new MessageException("Mã xác thực không chính xác");
@@ -320,8 +323,10 @@ public class UserService {
         if(passwordEncoder.matches(oldPass, user.getPassword())){
             user.setPassword(passwordEncoder.encode(newPass));
             userRepository.save(user);
+            auditLogService.saveByEmail("Thay đổi mật khẩu mới",LogLevel.INFO, user.getEmail());
         }
         else{
+            auditLogService.saveByEmail("Thay đổi mật khẩu mới thất bại",LogLevel.ERROR, user.getEmail());
             throw new MessageException("Mật khẩu cũ không chính xác", 500);
         }
     }
@@ -529,5 +534,17 @@ public class UserService {
 
         }, pageable);
 
+    }
+
+    public User updateMyInfor(UserUpdate userUpdate) {
+        User user = userUtils.getUserWithAuthority();
+        user.setGender(userUpdate.getGender());
+        user.setPhone(userUpdate.getPhone());
+        user.setAvatar(userUpdate.getAvatar());
+        user.setFullName(userUpdate.getFullName());
+        user.setDob(userUpdate.getDob());
+        user.setWards(userUpdate.getWards());
+        user.setAddress(userUpdate.getAddress());
+        return userRepository.save(user);
     }
 }

@@ -12,10 +12,15 @@ import com.web.repository.EventRegistrationRepository;
 import com.web.repository.EventRepository;
 import com.web.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -59,6 +64,11 @@ public class EventRegistrationService {
         if(!e.getStatus().equals(EventStatus.OPEN)){
             throw new MessageException("Xin lỗi, sự kiên này không còn được mở nữa");
         }
+        if(event.getStatus().equals(RegistrationStatus.CANCEL)){
+            event.setStatus(RegistrationStatus.PENDING);
+            eventRegistrationRepository.save(event);
+            return event;
+        }
         eventRegistration.setUser(user);
         eventRegistration.setRegistrationTime(LocalDateTime.now());
         eventRegistration.setStatus(RegistrationStatus.PENDING);
@@ -97,5 +107,35 @@ public class EventRegistrationService {
         }
 
         return map;
+    }
+
+    public Page<EventRegistration> myRegis(String search, RegistrationStatus status, Pageable pageable) {
+        User user = userUtils.getUserWithAuthority();
+        return eventRegistrationRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("user").get("id"), user.getId()));
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            else if (search != null) {
+                String pattern = "%" + search.toLowerCase() + "%";
+                predicates.add(cb.like(cb.lower(root.get("event").get("name")), pattern));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+    }
+
+    public EventRegistration cancel(Long id) {
+        EventRegistration e = eventRegistrationRepository.findById(id).get();
+        if(e.getEvent().getRegistrationDeadline().isBefore(LocalDateTime.now())){
+            throw new MessageException("Không thể gửi yêu cầu do đã quá hạn đăng ký và hủy");
+        }
+        if(!e.getEvent().getStatus().equals(EventStatus.OPEN)){
+            throw new MessageException("Xin lỗi, sự kiên này không còn được mở nữa");
+        }
+        e.setStatus(RegistrationStatus.CANCEL);
+        eventRegistrationRepository.save(e);
+        auditLogService.save("Hủy đăng ký sự kiện "+e.getEvent().getName(), LogLevel.INFO);
+        return e;
     }
 }

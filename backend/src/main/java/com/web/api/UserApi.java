@@ -190,5 +190,9 @@ public class UserApi {
         System.out.println("user");
     }
 
-
+    @PostMapping("/all/update-infor")
+    public ResponseEntity<?> updateMyInfor(@RequestBody UserUpdate userUpdate){
+        User user = userService.updateMyInfor(userUpdate);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 }

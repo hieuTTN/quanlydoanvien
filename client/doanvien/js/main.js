@@ -1,3 +1,4 @@
+var token = localStorage.getItem("token");
 $( document ).ready(function() {
     var menu = 
     `<div class="container">
@@ -44,7 +45,7 @@ $( document ).ready(function() {
 
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="my-infor.html">
                                 <i class="bi bi-person"></i> Hồ sơ
                             </a>
                         </li>
@@ -90,4 +91,89 @@ function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     window.location.href = "/login.html";
+}
+
+function loadSideBar() {
+    var sidebar =
+    `<div class="account-sidebar">
+
+        <div class="account-user-box text-center">
+            <img src="/image/default-avatar.jpg" id="avatar-sidebar" class="account-avatar mb-3">
+            <h6 id="fullname-account"></h6>
+            <small class="text-muted" id="username-sidebar"></small>
+        </div>
+
+        <ul class="account-menu">
+            <li>
+                <a href="my-infor.html" data-url="my-infor.html" class="account-menu-item">
+                    <i class="fas fa-user"></i>
+                    Thông tin tài khoản
+                </a>
+            </li>
+            <li>
+                <a href="my-regis-event.html" data-url="my-regis-event.html" class="account-menu-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    Sự kiện đã đăng ký
+                </a>
+            </li>
+            <li>
+                <a href="nhatkyhoatdong.html" data-url="nhatkyhoatdong.html" class="account-menu-item">
+                    <i class="fas fa-history"></i>
+                    Nhật ký hoạt động
+                </a>
+            </li>
+            <li>
+                <a href="changepassword.html" data-url="changepassword.html" class="account-menu-item">
+                    <i class="fas fa-lock"></i>
+                    Đổi mật khẩu
+                </a>
+            </li>
+        </ul>
+
+    </div>`
+    document.getElementById("sidebarmain").innerHTML = sidebar;
+    setActiveSidebar();
+    loadMyInforSidebar();
+
+}
+
+function setActiveSidebar() {
+
+    // Lấy file hiện tại (vd: my-infor.html)
+    var currentPath = window.location.pathname;
+    var currentPage = currentPath.substring(currentPath.lastIndexOf("/") + 1);
+
+    // Nếu đang ở root không có file
+    if (currentPage === "") {
+        currentPage = "my-infor.html";
+    }
+
+    // Lặp qua các item
+    document.querySelectorAll(".account-menu-item").forEach(function(item) {
+
+        var itemUrl = item.getAttribute("data-url");
+
+        // reset active
+        item.classList.remove("account-active");
+
+        // so sánh
+        if (itemUrl === currentPage) {
+            item.classList.add("account-active");
+        }
+    });
+}
+
+async function loadMyInforSidebar() {
+    const response = await fetch(`http://localhost:8080/api/user/all/user-logged`, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token
+        })
+    });
+    var result = await response.json();
+    document.getElementById("username-sidebar").textContent = result.email;
+    document.getElementById("fullname-account").textContent = result.fullName;
+    if(result.avatar != null && result.avatar != '') {
+        document.getElementById('avatar-sidebar').src = result.avatar;
+    }
 }

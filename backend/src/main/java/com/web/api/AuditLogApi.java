@@ -32,4 +32,14 @@ public class AuditLogApi {
 
         return ResponseEntity.ok(auditLogService.getLogs(keyword, logLevel, from, to, pageable));
     }
+
+    @GetMapping("/all/find-all")
+    public ResponseEntity<Page<AuditLog>> getLogsByUser(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to, Pageable pageable) {
+
+        return ResponseEntity.ok(auditLogService.getLogsByUser(from, to, pageable));
+    }
+
+
 }

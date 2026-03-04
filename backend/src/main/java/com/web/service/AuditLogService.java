@@ -36,6 +36,17 @@ public class AuditLogService {
         repository.save(auditLog);
     }
 
+    public void saveByEmail(String content, LogLevel logLevel, String email){
+        AuditLog auditLog = new AuditLog();
+        auditLog.setActionContent(content);
+        auditLog.setCreatedDate(LocalDateTime.now());
+        auditLog.setUsername(email);
+        auditLog.setLogLevel(logLevel);
+        repository.save(auditLog);
+    }
+
+
+
     public Page<AuditLog> getLogs(String keyword, LogLevel level, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         return repository.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -57,6 +68,25 @@ public class AuditLogService {
             } else if (from != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get("createdDate"), from));
             } else if (to != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdDate"), to));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+    }
+
+    public Page<AuditLog> getLogsByUser(LocalDateTime from, LocalDateTime to, Pageable pageable) {
+        User user = userUtils.getUserWithAuthority();
+        return repository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("username"), user.getEmail()));
+            if (from != null && to != null) {
+                predicates.add(cb.between(root.get("createdDate"), from, to));
+            }
+            else if (from != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdDate"), from));
+            }
+            else if (to != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("createdDate"), to));
             }
 
