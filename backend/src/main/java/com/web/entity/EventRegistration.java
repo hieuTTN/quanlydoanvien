@@ -1,5 +1,6 @@
 package com.web.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.web.enums.RegistrationStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +31,7 @@ public class EventRegistration {
     @JoinColumn(name = "registrant_id")
     private User user; // Người thực hiện thao tác đăng ký
 
+    @JsonFormat(pattern = "HH:mm dd/MM/yyyy")
     private LocalDateTime registrationTime;
 
     @Enumerated(EnumType.STRING)
@@ -37,5 +39,8 @@ public class EventRegistration {
 
     private String rejectReason; // Lý do nếu bị từ chối
 
+    private String rate;
+
     private Boolean attended = false; // Đánh dấu đã tham gia thực tế sau sự kiện
+
 }

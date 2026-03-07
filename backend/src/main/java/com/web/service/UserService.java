@@ -579,6 +579,8 @@ public class UserService {
         user.setDob(userUpdate.getDob());
         user.setWards(userUpdate.getWards());
         user.setAddress(userUpdate.getAddress());
+        user.setJob(userUpdate.getJob());
+        user.setReligion(userUpdate.getReligion());
         return userRepository.save(user);
     }
 

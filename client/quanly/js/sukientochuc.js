@@ -88,7 +88,6 @@ async function loadEvents(page) {
         })
     });
     var result = await response.json();
-    console.log(result)
     var list = result.content;
     var totalPage = result.totalPages;
     if(list.length == 0){
@@ -118,7 +117,7 @@ async function loadEvents(page) {
                         </div>
                         <div class="d-flex gap-1" style="margin-top: 5px;">
                             <button onclick="loadDetailEvent(${list[i].id})" data-bs-toggle="modal" data-bs-target="#eventDetailModal" class="btn btn-sm btn-info text-white"><i class="fa fa-eye"></i></button>
-                            <button onclick="loadDetailEvent(${list[i].id})" data-bs-toggle="modal" data-bs-target="#eventDetailModal" class="btn btn-sm btn-primary text-white"><i class="fa fa-users"></i></button>
+                            <button onclick="showThanhVien(0,${list[i].id}, '${list[i].name}')" data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-sm btn-primary text-white"><i class="fa fa-users"></i></button>
                         </div>
                     </td>
                 </tr>`
@@ -126,7 +125,7 @@ async function loadEvents(page) {
     document.getElementById("list-event").innerHTML = main
     var mainpage = ''
     for (i = 1; i <= totalPage; i++) {
-        mainpage += `<li onclick="loadEvents(${(Number(i) - 1)})" class="page-item"><a class="page-link" href="#">${i}</a></li>`
+        mainpage += `<li onclick="loadEvents(${(Number(i) - 1)})" class="page-item ${i== Number(page) + 1?'active':''}"><a class="page-link" href="#">${i}</a></li>`
     }
     document.getElementById("pagination").innerHTML = mainpage
 }
@@ -475,4 +474,277 @@ async function deleteEvent(id) {
             }
         }
     });
+}
+
+async function showThanhVien(page,id, name) {
+    document.getElementById("tensukien").innerHTML = name
+    // var search = document.getElementById("").value
+    // var status = document.getElementById("").value
+    var url = `http://localhost:8080/api/event-registration/manager-admin/regis-by-event?page=${page}&size=10&eventId=${id}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token
+        })
+    });
+    var result = await response.json();
+    console.log(result);
+    
+    var list = result.content;
+    var totalPage = result.totalPages;
+    if(list.length == 0){
+        document.getElementById("list-member").innerHTML = '<tr><td colspan="7" class="text-center">Không có dữ liệu</td></tr>';
+        document.getElementById("pagination-member").innerHTML = '';
+        return;
+    }
+    var main = '';
+    for (i = 0; i < list.length; i++) {
+        main += `<tr>
+                    <td>${list[i].id}</td>
+                    <td>
+                        <div class="fw-bold">${list[i].fullName ? list[i].fullName: list[i].user.fullName}</div>
+                        <small class="text-muted">${list[i].email ? list[i].email: list[i].user.email}</small><br>
+                        <small class="text-muted">${list[i].phone ? list[i].phone: list[i].user.phone}</small>
+                    </td>
+                    <td><a href="chitietsukien.html?id=${list[i].event.id}" target="_blank" class="text-truncate d-inline-block" style="max-width: 150px;">${list[i].event.name}</span></td>
+                    <td>${list[i].registrationTime}</td>
+                    <td>
+                        ${list[i].status.name != "REJECTED"
+                            ? `<span class="badge ${list[i].status.colorClass}">
+                                <i class="${list[i].status.icon}"></i> ${list[i].status.displayName}
+                            </span>`
+                            : `
+                            <div class="dropdown">
+                                <span class="badge ${list[i].status.colorClass} dropdown-toggle" 
+                                    data-bs-toggle="dropdown" style="cursor:pointer">
+                                    <i class="${list[i].status.icon}"></i> ${list[i].status.displayName}
+                                </span>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item text-danger">
+                                        <strong>Lý do:</strong><br>
+                                        ${list[i].rejectReason || 'Không có'}
+                                    </li>
+                                </ul>
+                            </div>
+                        `}
+                    </td>
+                    <td>
+                    ${list[i].status.name != "APPROVED"?'':`<input type="checkbox" ${list[i].attended == true?'checked':''} onchange="confirmThamGia(${list[i].id})">`}
+                    </td>
+                    <td>
+                        ${list[i].status.name == "PENDING"?
+                        `<button onclick="changeStatus(${list[i].id}, 'REJECTED',${id}, ${page}, '${name}')" class="btn btn-sm btn-danger" title="Từ chối">Từ chối</button>
+                        <button onclick="changeStatus(${list[i].id}, 'APPROVED',${id}, ${page}, '${name}')" class="btn btn-sm btn-primary" title="Duyệt">Duyệt</button>
+                        `:''}
+                        ${list[i].status.name == "APPROVED"?
+                        `<button onclick="changeStatus(${list[i].id}, 'REJECTED',${id}, ${page}, '${name}')" class="btn btn-sm btn-danger" title="Từ chối">Từ chối</button>
+                        <button onclick="changeStatus(${list[i].id}, 'PENDING',${id}, ${page}, '${name}')" class="btn btn-sm btn-secondary" title="Duyệt">Hủy duyệt</button>
+                        `:''}
+                        ${list[i].status.name == "REJECTED"?
+                        `<button onclick="changeStatus(${list[i].id}, 'APPROVED',${id}, ${page}, '${name}')" class="btn btn-sm btn-primary" title="Duyệt">Duyệt lại</button>
+                        `:''}
+                        <button onclick="writeDanhGia(${list[i].id},${id}, ${page}, '${name}')"" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></button>
+                    </td>
+                </tr>`
+    }
+    document.getElementById("list-member").innerHTML = main
+    var mainpage = ''
+    for (i = 1; i <= totalPage; i++) {
+        mainpage += `<li onclick="showThanhVien(${(Number(i) - 1)}, ${id}, '${name}')" class="page-item ${i==Number(page)+1?'active':''}"><a class="page-link" href="#">${i}</a></li>`
+    }
+    document.getElementById("pagination-member").innerHTML = mainpage
+    
+    loadStatistic(id);
+}
+
+async function loadStatistic(eventId){
+    var url = `http://localhost:8080/api/event-registration/manager-admin/statistic?eventId=${eventId}`;
+    const response = await fetch(url,{
+        headers:{
+            'Authorization':'Bearer ' + token
+        }
+    });
+    var result = await response.json();
+     let total = 0;
+    for(let key in result){
+        total += result[key];
+    }
+
+    let html = `
+    <div class="row g-3">
+
+        <div class="col-md-2">
+            <div class="card shadow border-0 text-center p-3">
+                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                <div class="text-muted">Tổng đăng ký</div>
+                <h3 class="fw-bold text-primary">${total}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow border-0 text-center p-3 bg-warning bg-opacity-10">
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <div>Chờ duyệt</div>
+                <h3 class="fw-bold text-warning">${result.PENDING || 0}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow border-0 text-center p-3 bg-success bg-opacity-10">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <div>Đã duyệt</div>
+                <h3 class="fw-bold text-success">${result.APPROVED || 0}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow border-0 text-center p-3 bg-danger bg-opacity-10">
+                <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
+                <div>Từ chối</div>
+                <h3 class="fw-bold text-danger">${result.REJECTED || 0}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow border-0 text-center p-3 bg-secondary bg-opacity-10">
+                <i class="fas fa-pause-circle fa-2x text-secondary mb-2"></i>
+                <div>Danh sách chờ</div>
+                <h3 class="fw-bold text-secondary">${result.WAITLIST || 0}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="card shadow border-0 text-center p-3 bg-dark bg-opacity-10">
+                <i class="fas fa-ban fa-2x text-dark mb-2"></i>
+                <div>Đã hủy</div>
+                <h3 class="fw-bold text-dark">${result.CANCEL || 0}</h3>
+            </div>
+        </div>
+
+    </div>
+    `;
+
+    document.getElementById("event-statistic").innerHTML = html;
+}
+
+async function changeStatus(id, status, idevent, page, name) {
+    if(status == 'REJECTED'){
+        Swal.fire({
+            target: '#staticBackdrop',
+            title: 'Nhập lý do từ chối',
+            input: 'textarea',
+            inputPlaceholder: 'Nhập lý do...',
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận',
+            cancelButtonText: 'Hủy',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Bạn phải nhập lý do!';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                actionUpdateStatus(id, status, result.value,idevent, page, name)
+            }
+        });
+    }
+    else{
+        actionUpdateStatus(id, status, "",idevent, page, name)
+    }
+
+}
+
+async function actionUpdateStatus(id, status, rejectReason, idevent, page, name) {
+    
+     var payload = {
+        "id": id,
+        "status": status,
+        "rejectReason": rejectReason,
+    }
+    
+    const response = await fetch(`http://localhost:8080/api/event-registration/manager-admin/update-status`, {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(payload)
+    });
+    if (response.status < 300) {
+        Swal.fire('Thành công!', 'Đã cập nhật trạng thái', 'success')
+        showThanhVien(page, idevent, name)
+    }
+    else if (response.status == 417) {
+        var result = await response.json()
+        Swal.fire('Thất bại!', result.defaultMessage, 'warning')
+    }
+    else{
+        Swal.fire('Thất bại!', "Có lỗi xảy ra khi update", 'error')
+    }
+}
+
+async function confirmThamGia(id) {
+    const response = await fetch(`http://localhost:8080/api/event-registration/manager-admin/confirm?id=${id}`, {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token
+        }),
+    });
+    if (response.status < 300) {
+        Swal.fire('Thành công!', 'Đã xác nhận tham gia', 'success')
+    }
+    else if (response.status == 417) {
+        var result = await response.json()
+        Swal.fire('Thất bại!', result.defaultMessage, 'warning')
+    }
+    else{
+        Swal.fire('Thất bại!', "Có lỗi xảy ra khi update", 'error')
+    }
+}
+
+async function writeDanhGia(id, idevent, page, name) {
+    Swal.fire({
+        target: '#staticBackdrop',
+        title: 'Viết đánh giá',
+        input: 'textarea',
+        inputPlaceholder: 'Nhập đánh giá...',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận',
+        cancelButtonText: 'Hủy',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Bạn phải nhập đánh giá!';
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            actionDanhGia(id, result.value,idevent, page, name)
+        }
+    });
+}
+
+async function actionDanhGia(id, rate, idevent, page, name) {
+     var payload = {
+        "id": id,
+        "rate": rate,
+    }
+    const response = await fetch(`http://localhost:8080/api/event-registration/manager-admin/rate`, {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(payload)
+    });
+    if (response.status < 300) {
+        Swal.fire('Thành công!', 'Đã cập nhật đánh giá', 'success')
+        showThanhVien(page, idevent, name)
+    }
+    else if (response.status == 417) {
+        var result = await response.json()
+        Swal.fire('Thất bại!', result.defaultMessage, 'warning')
+    }
+    else{
+        Swal.fire('Thất bại!', "Có lỗi xảy ra khi update", 'error')
+    }
 }

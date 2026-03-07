@@ -172,7 +172,7 @@ async function loadUsers(page) {
     }
     var main = '';
     for (i = 0; i < list.length; i++) {
-        main += ` <tr id="user-row-${list[i].id}" >
+        main += ` <tr id="user-row-${list[i].id}" onclick="toggleUserDetail(${list[i].id})" class="pointer">
                     <td><img src="${list[i].avatar || '/image/default-avatar.jpg'}" class="rounded-circle" width="35"></td>
                     <td>${list[i].fullName}</td>
                     <td>${list[i].email}</td>
@@ -190,6 +190,59 @@ async function loadUsers(page) {
                         <button onclick="deleteUser(${list[i].id})" class="btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i></button>
                     </td>
                 </tr>`
+        main +=  
+        `</tr>
+
+            <tr class="user-expand-row" id="expand-${list[i].id}">
+            <td colspan="7">
+
+            <div class="user-expand-content" id="content-${list[i].id}">
+
+            <div class="user-info-grid">
+
+            <div class="user-info-item">
+            <label>Số điện thoại</label>
+            <span>${list[i].phone || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Ngày sinh</label>
+            <span>${list[i].dob || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Giới tính</label>
+            <span>${list[i].gender || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Nghề nghiệp</label>
+            <span>${list[i].job || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Tôn giáo</label>
+            <span>${list[i].religion || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Mã đoàn sinh</label>
+            <span>${list[i].code || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>CCCD</label>
+            <span>${list[i].idc || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Ngày tạo</label>
+            <span>${list[i].createdDate || ''}</span>
+            </div>
+            </div>
+            </div>
+            </td>
+        </tr>`
     }
     document.getElementById("list-user").innerHTML = main
     var mainpage = ''
@@ -197,6 +250,23 @@ async function loadUsers(page) {
         mainpage += `<li onclick="loadUsers(${(Number(i) - 1)})" class="page-item"><a class="page-link" href="#">${i}</a></li>`
     }
     document.getElementById("pagination").innerHTML = mainpage
+}
+
+function toggleUserDetail(id){
+
+    var el = document.getElementById("content-"+id)
+
+    if(el.classList.contains("active")){
+        el.classList.remove("active")
+    }
+    else{
+
+        document.querySelectorAll(".user-expand-content").forEach(e=>{
+            e.classList.remove("active")
+        })
+
+        el.classList.add("active")
+    }
 }
 
 async function chooseAvatar(){

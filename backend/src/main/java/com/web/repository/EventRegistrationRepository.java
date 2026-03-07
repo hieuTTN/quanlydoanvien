@@ -1,5 +1,6 @@
 package com.web.repository;
 
+import com.web.dto.EventRegistrationStatistic;
 import com.web.entity.AuditLog;
 import com.web.entity.Event;
 import com.web.entity.EventRegistration;
@@ -19,4 +20,12 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
 
     @Query("select e from EventRegistration e where e.user.id = ?1 and e.event.id = ?2")
     EventRegistration countByUserAndEvent(Long userId, Long eventId);
+
+    @Query("""
+            select new com.web.dto.EventRegistrationStatistic(er.status, count(er.id))
+            from EventRegistration er
+            where er.event.id = :eventId
+            group by er.status
+           """)
+    List<EventRegistrationStatistic> statisticByEvent(Long eventId);
 }

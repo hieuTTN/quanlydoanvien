@@ -1,5 +1,6 @@
 package com.web.service;
 
+import com.web.dto.EventRegistrationStatistic;
 import com.web.entity.Event;
 import com.web.entity.EventRegistration;
 import com.web.entity.User;
@@ -18,10 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class EventRegistrationService {
@@ -64,7 +62,7 @@ public class EventRegistrationService {
         if(!e.getStatus().equals(EventStatus.OPEN)){
             throw new MessageException("Xin lỗi, sự kiên này không còn được mở nữa");
         }
-        if(event.getStatus().equals(RegistrationStatus.CANCEL)){
+        if(event != null && event.getStatus().equals(RegistrationStatus.CANCEL)){
             event.setStatus(RegistrationStatus.PENDING);
             eventRegistrationRepository.save(event);
             return event;
@@ -125,6 +123,21 @@ public class EventRegistrationService {
         }, pageable);
     }
 
+    public Page<EventRegistration> regisByEvent(String search, RegistrationStatus status, Long eventId, Pageable pageable) {
+        return eventRegistrationRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("event").get("id"), eventId));
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            else if (search != null) {
+                String pattern = "%" + search.toLowerCase() + "%";
+                predicates.add(cb.like(cb.lower(root.get("event").get("name")), pattern));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+    }
+
     public EventRegistration cancel(Long id) {
         EventRegistration e = eventRegistrationRepository.findById(id).get();
         if(e.getEvent().getRegistrationDeadline().isBefore(LocalDateTime.now())){
@@ -137,5 +150,51 @@ public class EventRegistrationService {
         eventRegistrationRepository.save(e);
         auditLogService.save("Hủy đăng ký sự kiện "+e.getEvent().getName(), LogLevel.INFO);
         return e;
+    }
+
+    public EventRegistration updateStatus(EventRegistration eventRegistration) {
+        EventRegistration ex = eventRegistrationRepository.findById(eventRegistration.getId()).orElseThrow(() -> new MessageException("Không tìm thấy đăng ký"));
+        ex.setStatus(eventRegistration.getStatus());
+        ex.setRejectReason(eventRegistration.getRejectReason());
+        if(!eventRegistration.getStatus().equals(RegistrationStatus.REJECTED)){
+            ex.setRejectReason(null);
+        }
+        return eventRegistrationRepository.save(ex);
+    }
+
+    public Map<RegistrationStatus, Long> statisticByEvent(Long eventId){
+
+        List<EventRegistrationStatistic> list = eventRegistrationRepository.statisticByEvent(eventId);
+
+        Map<RegistrationStatus, Long> result = new LinkedHashMap<>();
+
+        // khởi tạo tất cả status = 0
+        for (RegistrationStatus status : RegistrationStatus.values()) {
+            result.put(status, 0L);
+        }
+
+        // cập nhật số lượng thực tế từ DB
+        for (EventRegistrationStatistic item : list) {
+            result.put(item.getStatus(), item.getTotal());
+        }
+
+        return result;
+    }
+
+    public EventRegistration confirm(Long id) {
+        EventRegistration eventRegistration = eventRegistrationRepository.findById(id).orElseThrow(() -> new MessageException("Không tìm thấy dữ liệu"));
+        if(eventRegistration.getAttended() == null || eventRegistration.getAttended() == false){
+            eventRegistration.setAttended(true);
+        }
+        else{
+            eventRegistration.setAttended(false);
+        }
+        return eventRegistrationRepository.save(eventRegistration);
+    }
+
+    public EventRegistration rate(EventRegistration eventRegistration) {
+        EventRegistration ex = eventRegistrationRepository.findById(eventRegistration.getId()).orElseThrow(() -> new MessageException("Không tìm thấy đăng ký"));
+        ex.setRate(eventRegistration.getRate());
+        return eventRegistrationRepository.save(ex);
     }
 }

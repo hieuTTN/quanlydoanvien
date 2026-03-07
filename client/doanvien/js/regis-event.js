@@ -31,15 +31,30 @@ async function loadEventRegis(page) {
                     <td><a href="chitietsukien.html?id=${list[i].event.id}">${list[i].event.name}</a></td>
                     <td>${moment(list[i].event.registrationDeadline).format('HH:mm YYYY-MM-DD')}</td>
                     <td>
-                        <span class="badge" style="background-color: ${setBackGroundColorByStatus(list[i].status)}">
-                            ${list[i].status}
-                        </span>
+                         ${list[i].status.name != "REJECTED"
+                            ? `<span class="badge ${list[i].status.colorClass}">
+                                <i class="${list[i].status.icon}"></i> ${list[i].status.displayName}
+                            </span>`
+                            : `
+                            <div class="dropdown">
+                                <span class="badge ${list[i].status.colorClass} dropdown-toggle" 
+                                    data-bs-toggle="dropdown" style="cursor:pointer">
+                                    <i class="${list[i].status.icon}"></i> ${list[i].status.displayName}
+                                </span>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item text-danger">
+                                        <strong>Lý do:</strong><br>
+                                        ${list[i].rejectReason || 'Không có'}
+                                    </li>
+                                </ul>
+                            </div>
+                        `}
                     </td>
                     <td>
                         ${list[i].event.organizer ? list[i].event.organizer.name : 'Không có'}
                     </td>
                     <td>
-                        ${list[i].status === 'PENDING' ? `<button class="btn btn-danger btn-sm" onclick="cancelRegis(${list[i].id})">Hủy</button>` : ''}
+                        ${list[i].status.name === 'PENDING' ? `<button class="btn btn-danger btn-sm" onclick="cancelRegis(${list[i].id})">Hủy</button>` : ''}
                     </td>
                 </tr>`
     }

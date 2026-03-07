@@ -24,11 +24,13 @@ async function thongke() {
     document.getElementById("recentEventsTable").innerHTML = main;
 
     var dangKySuKienMoiNhat = result.dangKySuKienMoiNhat;
+    console.log(dangKySuKienMoiNhat);
+    
     var main = ``
     for(var i = 0; i < dangKySuKienMoiNhat.length; i++){
         main += `
         <tr>
-            <td>${dangKySuKienMoiNhat[i].registrant?.fullName}<br>${dangKySuKienMoiNhat[i].registrant?.email}</td>
+            <td>${dangKySuKienMoiNhat[i].fullName}<br>${dangKySuKienMoiNhat[i].email}</td>
             <td>${dangKySuKienMoiNhat[i].event.name}</td>
             <td><span class="badge bg-success">${dangKySuKienMoiNhat[i].registrationTime}</span></td>
         </tr>`

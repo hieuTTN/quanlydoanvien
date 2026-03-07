@@ -33,6 +33,12 @@ public class EventRegistrationApi {
         return eventRegistrationService.myRegis(search, status, pageable);
     }
 
+    @GetMapping("/manager-admin/regis-by-event")
+    public Page<EventRegistration> regisByEvent(@RequestParam(required = false) String search,
+                                           @RequestParam(required = false) RegistrationStatus status, Long eventId, Pageable pageable) {
+        return eventRegistrationService.regisByEvent(search, status,eventId, pageable);
+    }
+
     @GetMapping("/all/check-regis")
     public ResponseEntity<?> checkRegis(@RequestParam Long id) {
         Map<String, String> check = eventRegistrationService.checkRegis(id);
@@ -45,5 +51,26 @@ public class EventRegistrationApi {
         return new ResponseEntity<>(e,HttpStatus.OK);
     }
 
+    @PostMapping("/manager-admin/update-status")
+    public ResponseEntity<?> updateStatus(@RequestBody EventRegistration eventRegistration) {
+        EventRegistration e = eventRegistrationService.updateStatus(eventRegistration);
+        return new ResponseEntity<>(e,HttpStatus.OK);
+    }
 
+    @PostMapping("/manager-admin/rate")
+    public ResponseEntity<?> rate(@RequestBody EventRegistration eventRegistration) {
+        EventRegistration e = eventRegistrationService.rate(eventRegistration);
+        return new ResponseEntity<>(e,HttpStatus.OK);
+    }
+
+    @PostMapping("/manager-admin/confirm")
+    public ResponseEntity<?> confirm(@RequestParam Long id) {
+        EventRegistration e = eventRegistrationService.confirm(id);
+        return new ResponseEntity<>(e,HttpStatus.OK);
+    }
+
+    @GetMapping("/manager-admin/statistic")
+    public Map<RegistrationStatus, Long> statisticByEvent(@RequestParam Long eventId){
+        return eventRegistrationService.statisticByEvent(eventId);
+    }
 }

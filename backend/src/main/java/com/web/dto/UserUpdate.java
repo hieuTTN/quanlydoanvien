@@ -19,6 +19,10 @@ public class UserUpdate {
 
     private Date dob;
 
+    private String job;
+
+    private String religion;
+
     private String phone;
 
     private String address;

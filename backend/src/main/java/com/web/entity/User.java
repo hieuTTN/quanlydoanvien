@@ -48,6 +48,10 @@ public class User{
 
     private String address;
 
+    private String job;
+
+    private String religion;
+
     @ManyToOne
     private Wards wards;
 

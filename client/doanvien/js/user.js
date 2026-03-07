@@ -52,6 +52,8 @@ async function loadInitInfor() {
     document.getElementById('address').value = result.address;
     document.getElementById('avatarUrl').value = result.avatar;
     document.getElementById('birthday').value = result.dob;
+    document.getElementById('job').value = result.job;
+    document.getElementById('religion').value = result.religion;
     if(result.wards != null) {
         document.getElementById('tinh').value = result.wards.provinceCode;
         $("#tinh").val(result.wards.provinceCode).change()
@@ -69,6 +71,8 @@ async function updateInfor() {
         dob: document.getElementById("birthday").value,
         address: document.getElementById("address").value,     
         avatar: document.getElementById("avatarUrl").value,
+        job: document.getElementById("job").value,
+        religion: document.getElementById("religion").value,
         wards: {
             code: document.getElementById("xa").value
         },
