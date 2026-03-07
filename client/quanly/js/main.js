@@ -23,10 +23,10 @@ $( document ).ready(function() {
                     <a class="nav-link" href="/index.html" data-url-header="index.html"><i class="bi bi-house"></i> Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="sukien.html" data-url-header="sukien.html"><i class="bi bi-calendar-event"></i> Sự kiện</a>
+                    <a class="nav-link" href="sukien.html" data-url-header="sukien.html"><i class="bi bi-calendar-event"></i> Sự kiện chung</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-people"></i> Quản lý liên đoàn</a>
+                    <a class="nav-link" href="doanvien.html"><i class="bi bi-people"></i> Quản lý</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#"><i class="bi bi-award" ></i> Thành tích</a>
@@ -113,6 +113,12 @@ function loadSideBar() {
                 </a>
             </li>
             <li>
+                <a href="sukientochuc.html" data-url="sukientochuc.html" class="account-menu-item">
+                    <i class="fas fa-calendar"></i>
+                    Quản lý sự kiện
+                </a>
+            </li>
+            <li>
                 <a href="nhatkyhoatdong.html" data-url="nhatkyhoatdong.html" class="account-menu-item">
                     <i class="fas fa-history"></i>
                     Nhật ký hoạt động
@@ -136,10 +142,10 @@ function loadSideBar() {
     document.getElementById("sidebarmain").innerHTML = sidebar;
     var inforTop =
     `<div class="p-2 bg-white rounded shadow mb-3">
-        <div>
+        <div class="text-center">
             <h2 id="fullName1"></h2>
         </div>
-        <div id="breadcrumb"></div>
+        <div id="breadcrumb" class="d-flex justify-content-center"></div>
     </div>`
     document.getElementById("infor-top").innerHTML = inforTop
     setActiveSidebar();
@@ -199,13 +205,23 @@ async function loadMyInforSidebar() {
     });
     var list = await res.json();
     var main = '';
-    for(i=0; i< list.length; i++){
-        if(organization == null){
-            main += `<a href="doanvien.html?organization=${list[i].id}" class="btn btn-${i==0?'primary':'secondary'} m-2">${list[i].typeDisplayName}: ${list[i].name}</a>`
-        }
-        else{
-            main += `<a href="doanvien.html?organization=${list[i].id}" class="btn btn-${list[i].id == organization?'primary':'secondary'} m-2">${list[i].typeDisplayName}: ${list[i].name}</a>`
-        }
+    for(let i=0; i < list.length; i++){
+        // let btnClass = (organization == null) ? (i == 0 ? 'btn-primary' : 'btn-secondary') : 
+        //             (list[i].id == organization ? 'btn-primary' : 'btn-secondary');
+
+        let btnClass = (organization == null) ? 'btn-secondary' : 
+                    (list[i].id == organization ? 'btn-primary' : 'btn-secondary');
+
+        main += `
+        <div class="dropdown dropdown-hover d-inline-block m-2">
+            <button class="btn ${btnClass} dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                ${list[i].typeDisplayName}: ${list[i].name}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="doanvien.html?organization=${list[i].id}">Đoàn viên</a></li>
+                <li><a class="dropdown-item" href="sukientochuc.html?organization=${list[i].id}">Sự kiện</a></li>
+            </ul>
+        </div>`;
     }
     document.getElementById("breadcrumb").innerHTML = main;
 }

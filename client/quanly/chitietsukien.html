@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Đoàn Viên Portal</title>
+<link rel="icon" type="image/x-icon" href="/image/logo.webp">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/main.css">
+<script src="js/main.js"></script>
+<script src="js/event.js"></script>
+<script>
+    window.onload = function() {
+        loadAEvent();
+        loadMyInfor();
+        checkRegis();
+    }
+</script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg member-navbar" id="menu-doanvien">
+
+</nav>
+
+<div class="container my-4 shipping-section">
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item breadcrumb-product-name active" aria-current="page" id="ten-su-kien"></li>
+        </ol>
+    </nav>
+</div>
+
+
+<div class="container event-detail-wrapper">
+
+    <!-- BANNER -->
+    <div class="event-detail-banner" id="eventBanner">
+        <div class="event-detail-overlay"></div>
+        <div class="event-detail-banner-content">
+            <h2 id="eventName"></h2>
+            <div class="d-flex">
+                <div id="eventStatus"></div>
+                <div id="checkStatus" style="margin-left: 15px;"></div>
+            </div>
+            <!-- <span class="event-detail-status bg-success"></span> -->
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT -->
+        <div class="col-lg-8">
+
+            <div class="card event-detail-card p-4">
+
+                <h5 class="mb-3">Thông tin sự kiện</h5>
+
+                <div class="event-detail-info-item">
+                    📅 <strong>Thời gian:</strong>
+                    <span id="eventTime"></span>
+                </div>
+
+                <div class="event-detail-info-item">
+                    ⏳ <strong>Hạn đăng ký:</strong>
+                    <span id="eventDeadline"></span>
+                    (<span class="event-detail-countdown" id="eventCountdown"></span>)
+                </div>
+
+                <div class="event-detail-info-item">
+                    📍 <strong>Địa điểm:</strong>
+                    <span id="eventLocation"></span>
+                </div>
+
+                <div class="event-detail-info-item">
+                    🏢 <strong>Đơn vị tổ chức:</strong>
+                    <span id="eventOrganizer"></span>
+                </div>
+
+                <div class="event-detail-info-item">
+                    👥 <strong>Đối tượng:</strong>
+                    <span id="eventTarget"></span>
+                </div>
+
+                <hr>
+
+                <h5>Mô tả</h5>
+                <div id="eventDescription" class="mt-2"></div>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT REGISTER BOX -->
+        <div class="col-lg-4">
+
+            <div class="event-detail-register-box">
+
+                <h5 class="mb-3">Đăng ký tham gia</h5>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" id="regEmail">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Họ và tên</label>
+                    <input type="text" class="form-control" id="regFullName">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" class="form-control" id="regPhone">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Ghi chú</label>
+                    <textarea class="form-control" rows="3" id="regNote"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    💰 <strong>Phí tham gia:</strong>
+                    <span id="eventFee"></span>
+                </div>
+
+                <div class="mb-3">
+                    👤 <strong>Số lượng còn lại:</strong>
+                    <span id="eventSlot"></span>
+                </div>
+
+                <button class="btn btn-primary event-detail-btn-register"
+                        onclick="regisEvent()">
+                    Đăng ký ngay
+                </button>
+
+            </div>
+
+            <div class="event-detail-register-box" id="google-map-section" style="margin-top: 20px;">
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.web.api;
 
 import com.web.dto.EventFilterRequest;
 import com.web.dto.EventRequest;
+import com.web.dto.EventStatistic;
 import com.web.dto.EventStatusDto;
 import com.web.entity.Event;
 import com.web.enums.EventStatus;
@@ -31,8 +32,23 @@ public class EventApi {
         return eventService.update(id, req);
     }
 
+    @PostMapping("/manager/create")
+    public Event createByQuanLy(@RequestBody EventRequest req) {
+        return eventService.create(req);
+    }
+
+    @PostMapping("/manager/update/{id}")
+    public Event updateByQuanLy(@PathVariable Long id,@RequestBody EventRequest req) {
+        return eventService.update(id, req);
+    }
+
     @DeleteMapping("/admin/delete")
     public void delete(@RequestParam Long id) {
+        eventService.delete(id);
+    }
+
+    @DeleteMapping("/manager/delete")
+    public void deleteByQuanLy(@RequestParam Long id) {
         eventService.delete(id);
     }
 
@@ -51,6 +67,12 @@ public class EventApi {
         return eventService.filterByParam(search == null?"%%":"%"+search+"%", pageable );
     }
 
+    @GetMapping("/all/get-by-param-and-organizer")
+    public Page<Event> search(@RequestParam(required = false) String search,
+                                       @RequestParam(required = false) EventStatus status, @RequestParam Long organizer, Pageable pageable) {
+        return eventService.filterByParamAndOrganizer(search == null?"%%":"%"+search+"%", organizer, status, pageable );
+    }
+
     @GetMapping("/all/statuses")
     public List<EventStatusDto> getStatuses() {
         return Arrays.stream(EventStatus.values())
@@ -61,5 +83,6 @@ public class EventApi {
                 ))
                 .toList();
     }
+
 
 }

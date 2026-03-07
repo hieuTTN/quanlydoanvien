@@ -2,6 +2,7 @@ package com.web.service;
 
 import com.web.dto.EventFilterRequest;
 import com.web.dto.EventRequest;
+import com.web.dto.EventStatistic;
 import com.web.entity.Event;
 import com.web.entity.EventUpdateBy;
 import com.web.entity.Organization;
@@ -128,6 +129,12 @@ public class EventService {
 
     public Page<Event> filterByParam(String search, Pageable pageable) {
         Page<Event> page = eventRepository.filterByParam(search, pageable);
+        return page;
+    }
+
+    public Page<Event> filterByParamAndOrganizer(String search, Long organizer, EventStatus status, Pageable pageable) {
+//        Page<EventStatistic> page = eventRepository.searchEventStatistic(organizer,search, status == null?null:status.name(), pageable);
+        Page<Event> page = eventRepository.filterByParamAndOrganizer(search,organizer, status, pageable);
         return page;
     }
 
