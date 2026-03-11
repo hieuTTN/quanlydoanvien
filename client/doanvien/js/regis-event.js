@@ -89,7 +89,12 @@ async function cancelRegis(id) {
             if (response.status < 300) {
                 swal("Đã hủy!", "Đăng ký sự kiện đã được hủy thành công.", "success");
                 loadEventRegis(0);
-            } else {
+            } 
+            else if(response.status == 417){
+                var result = await response.json();
+                swal("Lỗi!", result.defaultMessage, "error");
+            }
+            else {
                 swal("Lỗi!", "Hủy đăng ký sự kiện thất bại. Vui lòng thử lại.", "error");
             }
         }

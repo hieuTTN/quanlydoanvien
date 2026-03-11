@@ -50,6 +50,7 @@
             <div class="d-flex">
                 <div id="eventStatus"></div>
                 <div id="checkStatus" style="margin-left: 15px;"></div>
+                <div id="listbtngroup"></div>
             </div>
             <!-- <span class="event-detail-status bg-success"></span> -->
         </div>
@@ -148,6 +149,83 @@
 
         </div>
 
+    </div>
+</div>
+
+<div class="modal fade" id="resultModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">
+                    Kết quả đăng ký sự kiện
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- Statistic -->
+                <div class="row text-center mb-4">
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm stat-card success">
+                            <div class="card-body">
+                                <h3 id="successCount" class="fw-bold text-success"></h3>
+                                <div class="text-muted">Thành công</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm stat-card fail">
+                            <div class="card-body">
+                                <h3 id="failCount" class="fw-bold text-danger"></h3>
+                                <div class="text-muted">Thất bại</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm stat-card total">
+                            <div class="card-body">
+                                <h3 id="totalCount" class="fw-bold text-primary"></h3>
+                                <div class="text-muted">Tổng</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Fail list -->
+                <div id="failSection" style="display:none">
+
+                    <h6 class="fw-bold mb-3 text-danger">
+                        Danh sách đã đăng ký trước đó
+                    </h6>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Họ tên</th>
+                                    <th>Email</th>
+                                    <th>SĐT</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="failUserTable"></tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
     </div>
 </div>
 </body>

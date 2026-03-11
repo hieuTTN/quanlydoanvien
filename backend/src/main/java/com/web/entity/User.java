@@ -58,5 +58,10 @@ public class User{
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @JsonManagedReference
     private List<UserAuthority> userAuthorities;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    @OrderBy("startDate ASC")
+    private List<OperationHistory> operationHistories = new ArrayList<>();
 }
 

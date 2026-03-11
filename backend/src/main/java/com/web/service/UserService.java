@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -537,7 +538,7 @@ public class UserService {
     }
 
     public Page<User> searchUsersByAll(String keyword, String gender, Long organizationId, Pageable pageable) {
-        return userRepository.findAll((root, query, cb) -> {
+        Page<User> page = userRepository.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             query.distinct(true);
             if (keyword != null && !keyword.trim().isEmpty()) {
@@ -568,6 +569,24 @@ public class UserService {
 
         }, pageable);
 
+        // sort bằng code
+        List<User> sorted = page.getContent().stream()
+                .sorted(Comparator.comparingInt(this::getAuthorityLevel))
+                .toList();
+
+        return new PageImpl<>(sorted, pageable, page.getTotalElements());
+    }
+
+    private int getAuthorityLevel(User user) {
+        if (user.getUserAuthorities() == null || user.getUserAuthorities().isEmpty()) {
+            return Integer.MAX_VALUE;
+        }
+
+        return user.getUserAuthorities().stream()
+                .map(ua -> ua.getAuthority().getLevel())
+                .filter(Objects::nonNull)
+                .min(Integer::compareTo)
+                .orElse(Integer.MAX_VALUE);
     }
 
     public User updateMyInfor(UserUpdate userUpdate) {

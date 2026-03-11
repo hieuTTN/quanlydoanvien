@@ -11,7 +11,7 @@ async function loadToChuc() {
         main += `<option value="${list[i].id}">${list[i].typeDisplayName}: ${list[i].name}</option>`
     }
     document.getElementById("organization").innerHTML = main;
-     $('#organization').select2({
+    $('#organization').select2({
         theme: "bootstrap-5",
         width: '100%', 
         templateSelection: (data) => data.text 
@@ -499,7 +499,7 @@ async function showThanhVien(page,id, name) {
     }
     var main = '';
     for (i = 0; i < list.length; i++) {
-        main += `<tr>
+        main += `<tr id="user-row-${list[i].user.id}" onclick="toggleUserDetail(${list[i].user.id})" class="pointer">
                     <td>${list[i].id}</td>
                     <td>
                         <div class="fw-bold">${list[i].fullName ? list[i].fullName: list[i].user.fullName}</div>
@@ -546,6 +546,89 @@ async function showThanhVien(page,id, name) {
                         <button onclick="writeDanhGia(${list[i].id},${id}, ${page}, '${name}')"" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></button>
                     </td>
                 </tr>`
+                main +=  
+        `</tr>
+            <tr class="user-expand-row" id="expand-${list[i].user.id}">
+            <td colspan="7">
+
+            <div class="user-expand-content" id="content-${list[i].user.id}">
+
+            <div class="user-info-grid">
+
+            <div class="user-info-item">
+            <label>Số điện thoại</label>
+            <span>${list[i].user.phone || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Ngày sinh</label>
+            <span>${list[i].user.dob || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Giới tính</label>
+            <span>${list[i].user.gender || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Nghề nghiệp</label>
+            <span>${list[i].user.job || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Tôn giáo</label>
+            <span>${list[i].user.religion || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+            <label>Mã đoàn sinh</label>
+            <span>${list[i].user.code || ''}</span>
+            </div>
+
+            <div class="user-info-item">
+                <label>CCCD</label>
+                <span>${list[i].user.idc || ''}</span>
+            </div>
+
+                <div class="user-info-item">
+                    <label>Ngày tạo</label>
+                    <span>${list[i].user.createdDate || ''}</span>
+                </div>
+                </div>
+                <div class="operation-history-wrapper">
+                    <h6 style="margin-bottom:10px;font-weight:600;">
+                    <i class="fa fa-history"></i> Tiểu sử
+                    </h6>
+                    <table class="operation-table">
+                        <thead>
+                            <tr>
+                            <th width="120">Ngày</th>
+                            <th width="200">Hoạt động</th>
+                            <th>Nội dung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${(list[i].user.operationHistories || []).map(h => `
+                            <tr>
+                            <td class="operation-date text-center">
+                            ${h.startDate || ''}
+                            </td>
+                            <td class="operation-title">
+                            <i class="fa fa-circle operation-icon"></i>
+                            ${h.title || ''}
+                            </td>
+                            <td>
+                            ${h.content || ''}
+                            </td>
+                            </tr>
+                        `).join('')}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+            </td>
+        </tr>`
     }
     document.getElementById("list-member").innerHTML = main
     var mainpage = ''
@@ -555,6 +638,22 @@ async function showThanhVien(page,id, name) {
     document.getElementById("pagination-member").innerHTML = mainpage
     
     loadStatistic(id);
+}
+
+function toggleUserDetail(id){
+    var el = document.getElementById("content-"+id)
+
+    if(el.classList.contains("active")){
+        el.classList.remove("active")
+    }
+    else{
+
+        document.querySelectorAll(".user-expand-content").forEach(e=>{
+            e.classList.remove("active")
+        })
+
+        el.classList.add("active")
+    }
 }
 
 async function loadStatistic(eventId){

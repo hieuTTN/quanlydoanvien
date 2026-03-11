@@ -27,6 +27,11 @@ public class EventRegistrationApi {
         return eventRegistrationService.create(eventRegistration);
     }
 
+    @PostMapping("/manager/create")
+    public Map<String, Object> createAll(@RequestParam Long eventId, @RequestParam Long organizationId) {
+        return eventRegistrationService.createAll(eventId, organizationId);
+    }
+
     @GetMapping("/all/my-regis")
     public Page<EventRegistration> myRegis(@RequestParam(required = false) String search,
                                            @RequestParam(required = false) RegistrationStatus status, Pageable pageable) {

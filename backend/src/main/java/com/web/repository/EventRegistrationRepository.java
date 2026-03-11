@@ -18,8 +18,14 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
 
     Long countEventRegistrationByStatus(RegistrationStatus status);
 
+    @Query("select count(e.id) from EventRegistration e where e.status = ?1 and e.event.id = ?2")
+    Long countEventRegistrationByStatusAndEvent(RegistrationStatus status, Long eventId);
+
     @Query("select e from EventRegistration e where e.user.id = ?1 and e.event.id = ?2")
     EventRegistration countByUserAndEvent(Long userId, Long eventId);
+
+    @Query("select count(e.id) from EventRegistration e where e.user.id = ?1 and e.event.id = ?2")
+    Long countByUserAndEvents(Long userId, Long eventId);
 
     @Query("""
             select new com.web.dto.EventRegistrationStatistic(er.status, count(er.id))

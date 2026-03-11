@@ -90,9 +90,19 @@ async function loadMyInfor() {
         })
     });
     var result = await response.json();
+    console.log(result);
+    var authos = result.userAuthorities;
+    var btnRegisDoan = '';
+    for(i=0; i<authos.length; i++){
+        if(authos[i].authority.name == "ROLE_DOAN_TRUONG"){
+            btnRegisDoan += `<button onclick="regisFullEvent(${authos[i].organization.id},'${authos[i].organization.name}')" class="badge bg-primary btn ms-2">Đăng ký cho cả ${authos[i].organization.name}</button>`
+        }
+    }
+
     document.getElementById("regEmail").value = result.email;
     document.getElementById("regFullName").value = result.fullName;
     document.getElementById("regPhone").value = result.phone;
+    document.getElementById("listbtngroup").innerHTML = btnRegisDoan;
 }
 
 async function checkRegis() {
@@ -157,4 +167,90 @@ async function regisEvent() {
             swal("Đã hủy", "Sự kiện của bạn vẫn an toàn :)", "warning");
         }
     });
+}
+
+async function regisFullEvent(idToChuc, name) {
+     swal({
+        title: "Bạn có chắc muốn đăng ký sự kiện này cho cả tổ chức "+name, 
+        text: "Sau khi đăng ký sẽ không thể hủy bỏ!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Có, tôi muốn đăng ký!",
+        cancelButtonText: "Không, quay lại!",
+        closeOnConfirm: false,
+        closeOnCancel: true
+    }, async function(isConfirm){
+        if (isConfirm) {
+            var id = window.location.search.split('=')[1];
+            const response = await fetch(`http://localhost:8080/api/event-registration/manager/create?organizationId=${idToChuc}&eventId=${id}`, {
+                method: 'POST',
+                headers: new Headers({
+                    'Authorization': 'Bearer ' + token
+                }),
+            });
+            var result = await response.json();
+            if (response.status < 300) {
+                // đóng swal này
+                swal.close();
+                showResultModal(result);
+            }
+            else {
+                if(response.status == 417){
+                    var result = await response.json();
+                    swal("Thất bại!", result.defaultMessage, "warning");
+                }
+                else{
+                    swal("Thất bại!", "Đăng ký sự kiện thất bại!", "error");
+                }
+            }
+        } 
+        else {
+            swal("Đã hủy", "Sự kiện của bạn vẫn an toàn :)", "warning");
+        }
+    });
+}
+
+function showResultModal(data){
+
+    document.getElementById("successCount").innerText = data.success;
+    document.getElementById("failCount").innerText = data.fail;
+    document.getElementById("totalCount").innerText = data.total;
+
+    const failTable = document.getElementById("failUserTable");
+    failTable.innerHTML = "";
+
+    if(data.userFail && data.userFail.length > 0){
+
+        document.getElementById("failSection").style.display = "block";
+
+        data.userFail.forEach(u => {
+
+            let avatar = u.avatar ? u.avatar : "/image/default-avatar.jpg";
+
+            failTable.innerHTML += `
+            <tr>
+                <td>
+                    <img src="${avatar}" 
+                         class="rounded-circle"
+                         width="40"
+                         height="40">
+                </td>
+
+                <td class="fw-semibold">${u.fullName ?? ''}</td>
+
+                <td class="text-muted">${u.email ?? ''}</td>
+
+                <td>${u.phone ?? ''}</td>
+            </tr>
+            `;
+        });
+
+    }
+    else{
+        document.getElementById("failSection").style.display = "none";
+    }
+
+    let modal = new bootstrap.Modal(document.getElementById("resultModal"));
+    modal.show();
 }

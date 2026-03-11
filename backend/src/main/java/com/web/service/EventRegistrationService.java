@@ -8,9 +8,7 @@ import com.web.enums.EventStatus;
 import com.web.enums.LogLevel;
 import com.web.enums.RegistrationStatus;
 import com.web.exception.MessageException;
-import com.web.repository.AuditLogRepository;
-import com.web.repository.EventRegistrationRepository;
-import com.web.repository.EventRepository;
+import com.web.repository.*;
 import com.web.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -36,9 +35,20 @@ public class EventRegistrationService {
     @Autowired
     private AuditLogService auditLogService;
 
+    @Autowired
+    private OperationHistoryService operationHistoryService;
+
+    @Autowired
+    private OperationHistoryRepository operationHistoryRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
     public EventRegistration create(EventRegistration eventRegistration){
+        Long countRegis = eventRegistrationRepository.countEventRegistrationByStatusAndEvent(RegistrationStatus.APPROVED, eventRegistration.getEvent().getId());
         User user = userUtils.getUserWithAuthority();
         EventRegistration event = eventRegistrationRepository.countByUserAndEvent(user.getId(), eventRegistration.getEvent().getId());
+
         if(event != null) {
             auditLogService.save("Gửi yêu cầu đăng ký sự kiện: "+event.getEvent().getName(), LogLevel.INFO);
             if (event.getStatus().equals(RegistrationStatus.PENDING)) {
@@ -52,10 +62,13 @@ public class EventRegistrationService {
             }
         }
         Event e = eventRepository.findById(eventRegistration.getEvent().getId()).get();
-        auditLogService.save("Gửi yêu cầu đăng ký sự kiện: "+e.getName(), LogLevel.INFO);
-        if(e.getCurrentPeople() == e.getMaxParticipants()){
-            throw new MessageException("Không thể gửi yêu cầu do đã đủ người tham gia");
+        if(e.getMaxParticipants() == countRegis.intValue()){
+            throw new MessageException("Đã đủ người, không thể đăng ký");
         }
+        auditLogService.save("Gửi yêu cầu đăng ký sự kiện: "+e.getName(), LogLevel.INFO);
+//        if(e.getCurrentPeople() == e.getMaxParticipants()){
+//            throw new MessageException("Không thể gửi yêu cầu do đã đủ người tham gia");
+//        }
         if(e.getRegistrationDeadline().isBefore(LocalDateTime.now())){
             throw new MessageException("Không thể gửi yêu cầu do đã quá hạn đăng ký");
         }
@@ -185,9 +198,11 @@ public class EventRegistrationService {
         EventRegistration eventRegistration = eventRegistrationRepository.findById(id).orElseThrow(() -> new MessageException("Không tìm thấy dữ liệu"));
         if(eventRegistration.getAttended() == null || eventRegistration.getAttended() == false){
             eventRegistration.setAttended(true);
+            operationHistoryService.saveByRegis(eventRegistration);
         }
         else{
             eventRegistration.setAttended(false);
+            operationHistoryRepository.deleteByEventRegistrationId(id);
         }
         return eventRegistrationRepository.save(eventRegistration);
     }
@@ -196,5 +211,41 @@ public class EventRegistrationService {
         EventRegistration ex = eventRegistrationRepository.findById(eventRegistration.getId()).orElseThrow(() -> new MessageException("Không tìm thấy đăng ký"));
         ex.setRate(eventRegistration.getRate());
         return eventRegistrationRepository.save(ex);
+    }
+
+    @Transactional
+    public Map<String, Object> createAll(Long eventId, Long organizationId) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new MessageException("Không tìm thấy event"));
+        List<User> users = userRepository.findByOrganizationId(organizationId);
+        Map<String, Object> map = new HashMap<>();
+        int success = 0;
+        int fail = 0;
+        int total = users.size();
+        LocalDateTime now = LocalDateTime.now();
+        List<User> userFail = new ArrayList<>();
+        for(User u : users){
+            if(eventRegistrationRepository.countByUserAndEvents(u.getId(), eventId) > 0){
+                ++ fail;
+                userFail.add(u);
+            }
+            else{
+                ++ success;
+                EventRegistration e = new EventRegistration();
+                e.setEvent(event);
+                e.setStatus(RegistrationStatus.PENDING);
+                e.setUser(u);
+                e.setEmail(e.getEmail());
+                e.setFullName(e.getFullName());
+                e.setPhone(u.getPhone());
+                e.setRegistrationTime(now);
+                eventRegistrationRepository.save(e);
+            }
+        }
+        map.put("success",success);
+        map.put("fail",fail);
+        map.put("total",total);
+        map.put("userFail",userFail);
+        map.put("allUsers",users);
+        return map;
     }
 }

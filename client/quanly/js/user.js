@@ -185,14 +185,13 @@ async function loadUsers(page) {
                         ${list[i].userAuthorities.map(auth => auth.authority.name).includes("ROLE_DAO_TRUONG") ? '<span class="badge bg-success">Đạo trưởng</span>':''}
                         ${list[i].userAuthorities.map(auth => auth.authority.name).includes("ROLE_CHAU_TRUONG") ? '<span class="badge bg-success">Châu trưởng</span>':''}
                     </td>
-                    <td class="text-end">
+                    <td class="text-end" onclick="event.stopPropagation()">
                         <a href="add-user.html?id=${list[i].id}" class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
                         <button onclick="deleteUser(${list[i].id})" class="btn btn-sm btn-danger"><i class="fa fa-trash-alt"></i></button>
                     </td>
                 </tr>`
         main +=  
         `</tr>
-
             <tr class="user-expand-row" id="expand-${list[i].id}">
             <td colspan="7">
 
@@ -231,15 +230,46 @@ async function loadUsers(page) {
             </div>
 
             <div class="user-info-item">
-            <label>CCCD</label>
-            <span>${list[i].idc || ''}</span>
+                <label>CCCD</label>
+                <span>${list[i].idc || ''}</span>
             </div>
 
-            <div class="user-info-item">
-            <label>Ngày tạo</label>
-            <span>${list[i].createdDate || ''}</span>
-            </div>
-            </div>
+                <div class="user-info-item">
+                    <label>Ngày tạo</label>
+                    <span>${list[i].createdDate || ''}</span>
+                </div>
+                </div>
+                <div class="operation-history-wrapper">
+                    <h6 style="margin-bottom:10px;font-weight:600;">
+                    <i class="fa fa-history"></i> Tiểu sử
+                    </h6>
+                    <table class="operation-table">
+                        <thead>
+                            <tr>
+                            <th width="120">Ngày</th>
+                            <th width="200">Hoạt động</th>
+                            <th>Nội dung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${(list[i].operationHistories || []).map(h => `
+                            <tr>
+                            <td class="operation-date text-center">
+                            ${h.startDate || ''}
+                            </td>
+                            <td class="operation-title">
+                            <i class="fa fa-circle operation-icon"></i>
+                            ${h.title || ''}
+                            </td>
+                            <td>
+                            ${h.content || ''}
+                            </td>
+                            </tr>
+                        `).join('')}
+                        </tbody>
+                    </table>
+
+                </div>
             </div>
             </td>
         </tr>`
@@ -510,6 +540,7 @@ async function saveUser() {
 async function loadAUser() {
     var id = window.location.search.split('=')[1];
     if (id != null) {
+        document.getElementById("lichsuhoatdong").style.display = 'block'
         var url = `http://localhost:8080/api/user/all/${id}`;
         const response = await fetch(url, {
             method: 'GET',
@@ -556,6 +587,8 @@ async function loadAUser() {
             row.querySelector(".isHead").checked = a.isHead;
             row.querySelector(".isDefault").checked = a.isDefault;
         }
+
+        loadTieuSu();
     }
 }
 
@@ -595,6 +628,134 @@ async function deleteUser(id) {
                 }
             } catch (error) {
                 swal("Lỗi!", "Không thể kết nối đến máy chủ.", "error");
+            }
+        }
+    });
+}
+
+function addRowTieuSu(){
+    const tbody = document.getElementById("listtieusu");
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+        <td style="max-width: 10%;"><input readonly style="width: 50px;" class="form-control org-type"></td>
+        <td style="max-width: 15%;"><input class="form-control org-type name"></td>
+        <td style="max-width: 10%;"><input type="date" class="form-control org-type start"></td>
+        <td style="max-width: 10%;"><input type="date" class="form-control org-type end"></td>
+        <td style="max-width: 30%;"><textarea class="form-control org-type note"></textarea></td>
+        <td>
+            <button class="btn btn-sm btn-primary" onclick="saveRow(this)">
+                <i class="fa fa-check"></i>
+            </button>
+            <button class="btn btn-sm btn-danger">X</button>
+        </td>
+    `;
+
+    tbody.appendChild(tr);
+}
+
+async function saveRow(btn){
+    const tr = btn.closest("tr");
+
+    const id = tr.querySelector(".org-type").value;
+    const name = tr.querySelector(".name").value;
+    const start = tr.querySelector(".start").value;
+    const end = tr.querySelector(".end").value;
+    const note = tr.querySelector(".note").value;
+
+    console.log(name, start, end, note);
+    var uls = new URL(document.URL)
+    var idUser = uls.searchParams.get("id");
+    var payload = {
+        id:id,
+        title:name,
+        content:note,
+        startDate:start,
+        endDate:end,
+        user:{id:idUser},
+    }
+
+    const response = await fetch('http://localhost:8080/api/OperationHistory/all/create', {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(payload)
+    });
+    if (response.status < 300) {
+        swal({
+                title: "Thông báo",
+                text: "thêm tiểu sử thành công!",
+                type: "success"
+            },
+            function() {
+                loadTieuSu();
+            });
+    }
+    else{
+        toastr.warning("Thất bại");
+    }
+}
+
+async function loadTieuSu(){
+    var uls = new URL(document.URL)
+    var id = uls.searchParams.get("id");
+    const response = await fetch('http://localhost:8080/api/OperationHistory/all/find-by-user?userID='+id, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+        }),
+    }); 
+    var list = await response.json();
+    console.log(list);
+    
+    if(list.length == 0){return}
+    var main = '';
+    for(i=0; i< list.length; i++){
+        main += 
+        ` <tr>
+            <td style="max-width: 10%;"><input readonly style="width: 50px;" class="form-control org-type" value="${list[i].id}"></td>
+            <td style="max-width: 15%;"><input class="form-control org-type name" value="${list[i].title}"></td>
+            <td style="max-width: 10%;"><input type="date" class="form-control org-type start" value="${list[i].startDate}"></td>
+            <td style="max-width: 10%;"><input type="date" class="form-control org-type end" value="${list[i].endDate}"></td>
+            <td style="max-width: 30%;"><textarea class="form-control org-type note">${list[i].content}</textarea></td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="saveRow(this)">
+                    <i class="fa fa-check"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="deleteTieuSu(${list[i].id})">X</button>
+            </td>
+        <tr>`
+    }
+    document.getElementById("listtieusu").innerHTML = main
+}
+
+async function deleteTieuSu(id) {
+    swal({
+        title: "Bạn có chắc muốn xóa tiểu sử này?", 
+        text: "Sau khi xóa sẽ không thể khôi phục lại được!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Có, tôi muốn xóa!",
+        cancelButtonText: "Không, giữ lại!",
+        closeOnConfirm: false,
+        closeOnCancel: true
+    },
+    async function(isConfirm){
+        if (isConfirm) {
+            const response = await fetch(`http://localhost:8080/api/OperationHistory/all/delete?id=${id}`, {
+                method: 'DELETE',
+                headers: new Headers({
+                    'Authorization': 'Bearer ' + token
+                })
+            });
+            if (response.status < 300) {
+                swal("Đã xóa!", "Tiểu sử đã được xóa thành công.", "success");
+                loadTieuSu();
+            } else {
+                swal("Lỗi!", "Xóa tiểu sử thất bại. Vui lòng thử lại.", "error");
             }
         }
     });

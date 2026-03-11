@@ -20,4 +20,7 @@ public class Authority {
 
     @Enumerated(EnumType.STRING)
     private OrganizationType organizationType;
+
+    private Integer level;
+
 }

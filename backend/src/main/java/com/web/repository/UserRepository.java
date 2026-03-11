@@ -32,4 +32,7 @@ public interface UserRepository extends JpaRepository<User,Long>, JpaSpecificati
     List<User> findByRole(String role);
 
     boolean existsByEmail(String email);
+
+    @Query("select u.user from UserAuthority u where u.organization.id = ?1")
+    List<User> findByOrganizationId(Long organizationId);
 }

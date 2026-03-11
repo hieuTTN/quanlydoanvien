@@ -161,7 +161,6 @@
 
                     </div>
 
-
                     <table class="table table-bordered mt-2 mb-2">
 
                         <thead>
@@ -190,10 +189,44 @@
 
                     </table>
                     <button onclick="saveUser()" id="btn-submit" class="btn btn-primary">
-
                         Lưu User
-
                     </button>
+
+                    <div id="lichsuhoatdong" style="display: none;">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5>Tiểu sử của đoàn viên</h5>
+                            <button type="button"
+                                    class="btn btn-success btn-sm"
+                                    onclick="addRowTieuSu()">
+                                Thêm tiểu sử
+                            </button>
+                        </div>
+                        <table class="table table-bordered mt-2 mb-2">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Từ ngày</th>
+                                    <th>Đến ngày</th>
+                                    <th>Nội dung</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listtieusu">
+                                <!-- <tr>
+                                    <td style="max-width: 10%;"><input readonly style="width: 50px;" class="form-control org-type"></td>
+                                    <td style="max-width: 15%;"><input class="form-control org-type"></td>
+                                    <td style="max-width: 10%;"><input type="date" class="form-control org-type"></td>
+                                    <td style="max-width: 10%;"><input type="date" class="form-control org-type"></td>
+                                    <td style="max-width: 30%;"><textarea class="form-control org-type"></textarea></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary"><i class="fa fa-check"></i></button>
+                                        <button class="btn btn-sm btn-danger">X</button>
+                                    </td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             </div>

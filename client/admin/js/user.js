@@ -143,6 +143,7 @@ async function loadUsers(page) {
         }).join('<br> ');
         main += ` <tr id="user-row-${list[i].id}">
                     <td><img src="${list[i].avatar || '/image/default-avatar.jpg'}" class="rounded-circle" width="35"></td>
+                    <td>${list[i].id}</td>
                     <td>${list[i].fullName}</td>
                     <td>${list[i].email}</td>
                     <td>${authoName}</td>

@@ -761,3 +761,202 @@ table i{
 .user-row:hover{
     background:#f1f5ff;
 }
+.active-child{
+    background-color: #0d6efd;
+}
+.active-child a{
+    color: #fff !important;
+}
+.active-child a:hover{
+     background-color: #0d6efd;
+    color: #fff !important;
+}
+.user-timeline{
+    margin-top:20px;
+    padding-left:20px;
+    border-left:3px solid #2b6edc;
+    position:relative;
+}
+
+.timeline-item{
+    position:relative;
+    padding-left:20px;
+    margin-bottom:20px;
+    opacity:0;
+    transform:translateY(10px);
+    animation:timelineFade .4s ease forwards;
+}
+
+.timeline-item:nth-child(1){animation-delay:.1s}
+.timeline-item:nth-child(2){animation-delay:.2s}
+.timeline-item:nth-child(3){animation-delay:.3s}
+.timeline-item:nth-child(4){animation-delay:.4s}
+
+.timeline-dot{
+    position:absolute;
+    left:-12px;
+    top:5px;
+    width:14px;
+    height:14px;
+    background:#2b6edc;
+    border-radius:50%;
+}
+
+.timeline-date{
+    font-weight:600;
+    color:#0d1b2a;
+}
+
+.timeline-title{
+    font-weight:500;
+    color:#1d3557;
+}
+
+.timeline-content{
+    font-size:14px;
+    color:#555;
+}
+
+@keyframes timelineFade{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+.operation-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    margin-top:25px;
+    font-size:14px;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+.operation-table thead{
+    background:#f4f6fb;
+}
+
+.operation-table th{
+    text-align:left;
+    padding:12px 15px;
+    font-weight:600;
+    color:#444;
+    border-bottom:1px solid #eee;
+}
+
+.operation-table td{
+    padding:12px 15px;
+    border-bottom:1px solid #f0f0f0;
+}
+
+.operation-table tbody tr{
+    transition:all .25s ease;
+}
+
+.operation-table tbody tr:hover{
+    background:#f7f9ff;
+    transform:scale(1.01);
+}
+
+.operation-table tbody tr:last-child td{
+    border-bottom:none;
+}
+
+.operation-date{
+    font-weight:600;
+    color:#2b6edc;
+}
+
+.operation-badge{
+    background:#e8f0ff;
+    color:#2b6edc;
+    padding:4px 10px;
+    border-radius:6px;
+    font-size:12px;
+}
+
+.operation-title{
+    font-weight:600;
+}
+
+.operation-icon{
+    color:#2b6edc;
+    font-size:16px;
+}
+
+.operation-history-wrapper{
+    margin-top:25px;
+    animation:fadeHistory .4s ease;
+}
+
+@keyframes fadeHistory{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+.operation-table td{
+    padding:16px 20px;   /* trước là 12px 15px */
+    border-bottom:1px solid #f0f0f0;
+    line-height:1.6;     /* giúp dòng cao hơn */
+}
+
+.operation-table th{
+    padding:16px 20px;   /* header cũng rộng ra */
+}
+
+.operation-table tbody tr{
+    transition:all .25s ease;
+    height:60px;         /* chiều cao tối thiểu mỗi dòng */
+}
+.operation-table{
+    font-size:15px;
+}
+
+.operation-table tbody tr:hover{
+    background:#f7f9ff;
+    transform:scale(1.01);
+}
+.stat-card{
+    transition: all .3s ease;
+    border-radius: 15px;
+}
+
+.stat-card:hover{
+    transform: translateY(-5px);
+    box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.stat-card.success{
+    background: linear-gradient(135deg,#e8fff1,#ffffff);
+}
+
+.stat-card.fail{
+    background: linear-gradient(135deg,#ffecec,#ffffff);
+}
+
+.stat-card.total{
+    background: linear-gradient(135deg,#eef5ff,#ffffff);
+}
+
+#failUserTable tr{
+    animation: fadeIn .4s ease forwards;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}

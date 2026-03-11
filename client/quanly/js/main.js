@@ -20,7 +20,7 @@ $( document ).ready(function() {
 
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/index.html" data-url-header="index.html"><i class="bi bi-house"></i> Trang chủ</a>
+                    <a class="nav-link" href="index.html" data-url-header="index.html"><i class="bi bi-house"></i> Trang chủ</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="sukien.html" data-url-header="sukien.html"><i class="bi bi-calendar-event"></i> Sự kiện chung</a>
@@ -197,6 +197,8 @@ async function loadMyInforSidebar() {
 
     var uls = new URL(document.URL)
     var organization = uls.searchParams.get("organization");
+
+    const fileName = uls.pathname.split('/').pop();
     const res = await fetch(`http://localhost:8080/api/organizations/all/find-by-user`, {
         method: 'GET',
         headers: new Headers({
@@ -211,15 +213,14 @@ async function loadMyInforSidebar() {
 
         let btnClass = (organization == null) ? 'btn-secondary' : 
                     (list[i].id == organization ? 'btn-primary' : 'btn-secondary');
-
         main += `
         <div class="dropdown dropdown-hover d-inline-block m-2">
             <button class="btn ${btnClass} dropdown-toggle" type="button" data-bs-toggle="dropdown">
                 ${list[i].typeDisplayName}: ${list[i].name}
             </button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="doanvien.html?organization=${list[i].id}">Đoàn viên</a></li>
-                <li><a class="dropdown-item" href="sukientochuc.html?organization=${list[i].id}">Sự kiện</a></li>
+                <li class="${fileName == 'doanvien.html' && list[i].id == organization?'active-child':''}"><a class="dropdown-item" href="doanvien.html?organization=${list[i].id}">Đoàn viên</a></li>
+                <li class="${fileName == 'sukientochuc.html' && list[i].id == organization?'active-child':''}"><a class="dropdown-item" href="sukientochuc.html?organization=${list[i].id}">Sự kiện</a></li>
             </ul>
         </div>`;
     }
