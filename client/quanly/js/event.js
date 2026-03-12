@@ -122,7 +122,7 @@ async function checkRegis() {
 }
 
 async function regisEvent() {
-     swal({
+     swal.fire({
         title: "Bạn có chắc muốn đăng ký sự kiện này?", 
         text: "Sau khi đăng ký sẽ không thể hủy bỏ!",
         type: "warning",
@@ -170,45 +170,52 @@ async function regisEvent() {
 }
 
 async function regisFullEvent(idToChuc, name) {
-     swal({
-        title: "Bạn có chắc muốn đăng ký sự kiện này cho cả tổ chức "+name, 
-        text: "Sau khi đăng ký sẽ không thể hủy bỏ!",
-        type: "warning",
+    document.getElementById("idtochuc").value = idToChuc
+    const result = await Swal.fire({
+        title: "Đăng ký sự kiện",
+        text: "Bạn muốn đăng ký sự kiện này cho tổ chức " + name + " như thế nào?",
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Có, tôi muốn đăng ký!",
-        cancelButtonText: "Không, quay lại!",
-        closeOnConfirm: false,
-        closeOnCancel: true
-    }, async function(isConfirm){
-        if (isConfirm) {
-            var id = window.location.search.split('=')[1];
-            const response = await fetch(`http://localhost:8080/api/event-registration/manager/create?organizationId=${idToChuc}&eventId=${id}`, {
-                method: 'POST',
-                headers: new Headers({
-                    'Authorization': 'Bearer ' + token
-                }),
-            });
-            var result = await response.json();
-            if (response.status < 300) {
-                // đóng swal này
-                swal.close();
-                showResultModal(result);
-            }
-            else {
-                if(response.status == 417){
-                    var result = await response.json();
-                    swal("Thất bại!", result.defaultMessage, "warning");
-                }
-                else{
-                    swal("Thất bại!", "Đăng ký sự kiện thất bại!", "error");
-                }
-            }
-        } 
-        else {
-            swal("Đã hủy", "Sự kiện của bạn vẫn an toàn :)", "warning");
-        }
+        showDenyButton: true,
+        confirmButtonText: "Đăng ký tất cả",
+        denyButtonText: "Chọn thành viên",
+        cancelButtonText: "Hủy",
+        reverseButtons: true
     });
+
+    if (result.isConfirmed) {
+        createByAll(idToChuc);
+    }
+
+    else if (result.isDenied) {
+        getAllUserToChuc(idToChuc);
+    }
+
+}
+
+async function createByAll(idToChuc) {
+    var id = window.location.search.split('=')[1];
+    const response = await fetch(`http://localhost:8080/api/event-registration/manager/create?organizationId=${idToChuc}&eventId=${id}`, {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token
+        }),
+    });
+    var result = await response.json();
+    if (response.status < 300) {
+        // đóng swal này
+        swal.close();
+        showResultModal(result);
+    }
+    else {
+        if(response.status == 417){
+            var result = await response.json();
+            swal.fire("Thất bại!", result.defaultMessage, "warning");
+        }
+        else{
+            swal.fire("Thất bại!", "Đăng ký sự kiện thất bại!", "error");
+        }
+    }
 }
 
 function showResultModal(data){
@@ -253,4 +260,109 @@ function showResultModal(data){
 
     let modal = new bootstrap.Modal(document.getElementById("resultModal"));
     modal.show();
+}
+
+async function getAllUserToChuc(idToChuc) {
+    var search = document.getElementById("searchUser").value
+    var gender = document.getElementById("gender").value
+    var url = `http://localhost:8080/api/user/manager/filter-list?organizationId=${idToChuc}`;
+    if(search != null && search != ''){
+        url += `&keyword=${search}`
+    }
+    if(gender != null && gender != ''){
+        url += `&gender=${gender}`
+    }
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token
+        }),
+    });
+    var list = await response.json();
+    renderUserList(list)
+}
+
+function renderUserList(list){
+
+    const tbody = document.getElementById("userTableBody");
+    tbody.innerHTML = "";
+
+    list.forEach(u => {
+
+        tbody.innerHTML += `
+        <tr class="user-row">
+
+            <td>
+                <div class="form-check">
+                    <input class="form-check-input user-checkbox"
+                           type="checkbox"
+                           value="${u.id}">
+                </div>
+            </td>
+
+            <td>
+                <img src="${u.avatar || '/image/default-avatar.jpg'}"
+                     class="rounded-circle"
+                     width="40">
+            </td>
+
+            <td class="fw-semibold">${u.fullName}</td>
+            <td class="fw-semibold">${u.gender}</td>
+
+            <td>${u.email || ""}</td>
+
+            <td>${u.phone || ""}</td>
+
+        </tr>
+        `;
+    });
+    const modalEl = document.getElementById("userSelectModal");
+
+    if (modalEl.classList.contains("show")) {
+    } else {
+        let modal = new bootstrap.Modal(document.getElementById("userSelectModal"));
+        modal.show();
+    }
+    document.getElementById("checkAllUsers").addEventListener("change", function(){
+        document.querySelectorAll(".user-checkbox").forEach(cb=>{
+            cb.checked = this.checked;
+        });
+    });
+}
+
+async function createByChooseUser() {
+    var id = window.location.search.split('=')[1];
+    const ids = [];
+
+    document.querySelectorAll(".user-checkbox:checked").forEach(cb => {
+        ids.push(cb.value);
+    });
+    if(ids.length == 0){
+        swal.fire("Thông báo!", "Bạn phải chọn ít nhất 1 đoàn viên", "error");
+        return;
+    }
+    const response = await fetch(`http://localhost:8080/api/event-registration/manager/create-by-list-user?eventId=${id}`, {
+        method: 'POST',
+        headers: new Headers({
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        }),
+        body: JSON.stringify(ids)
+    });
+    var result = await response.json();
+    if (response.status < 300) {
+        const modalEl = document.getElementById("userSelectModal");
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+        showResultModal(result);
+    }
+    else {
+        if(response.status == 417){
+            var result = await response.json();
+            swal.fire("Thất bại!", result.defaultMessage, "warning");
+        }
+        else{
+            swal.fire("Thất bại!", "Đăng ký sự kiện thất bại!", "error");
+        }
+    }
 }

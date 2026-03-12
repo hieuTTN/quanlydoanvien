@@ -168,6 +168,12 @@ public class UserApi {
         return userService.searchUsersByAll(keyword,gender,organizationId,pageable);
     }
 
+    @GetMapping("/manager/filter-list")
+    public List<User> findByOrganizationId(@RequestParam(required = false) String keyword, @RequestParam(required = false) String gender,
+             @RequestParam Long organizationId) {
+        return userService.searchUsersByAll(keyword,gender,organizationId);
+    }
+
     @GetMapping("/admin/{id}")
     public User getById(@PathVariable Long id) {
         return userService.findById(id);

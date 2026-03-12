@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.0.2/js/toastr.min.js"></script>
@@ -227,6 +228,72 @@
 
         </div>
     </div>
+</div>
+
+
+<div class="modal fade" id="userSelectModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content shadow-lg border-0">
+
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold">Chọn thành viên tham gia sự kiện</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- search -->
+        <div class="row">
+            <div class="col-sm-8">
+                <input type="hidden" id="idtochuc">
+                <input id="searchUser" onkeyup="getAllUserToChuc(document.getElementById('idtochuc').value)" class="form-control" placeholder="Tìm kiếm thành viên...">
+            </div>
+            <div class="col-sm-4">
+                <select class="form-control" id="gender" onchange="getAllUserToChuc(document.getElementById('idtochuc').value)">
+                    <option value="">-- Chọn giới tính --</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th style="width:60px">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="checkAllUsers">
+                  </div>
+                </th>
+                <th>Ảnh</th>
+                <th>Họ tên</th>
+                <th>Giới tính</th>
+                <th>Email</th>
+                <th>SĐT</th>
+              </tr>
+            </thead>
+
+            <tbody id="userTableBody">
+              
+            </tbody>
+
+          </table>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          Hủy
+        </button>
+
+        <button class="btn btn-primary px-4" onclick="createByChooseUser()">
+          Đăng ký
+        </button>
+      </div>
+
+    </div>
+  </div>
 </div>
 </body>
 </html>

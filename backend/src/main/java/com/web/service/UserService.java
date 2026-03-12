@@ -577,6 +577,46 @@ public class UserService {
         return new PageImpl<>(sorted, pageable, page.getTotalElements());
     }
 
+    public List<User> searchUsersByAll(String keyword, String gender, Long organizationId) {
+        List<User> list = userRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            query.distinct(true);
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                String pattern = "%" + keyword.toLowerCase().trim() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("email")), pattern),
+                        cb.like(cb.lower(root.get("fullName")), pattern),
+                        cb.like(cb.lower(root.get("phone")), pattern),
+                        cb.like(cb.lower(root.get("idc")), pattern)
+                ));
+            }
+            if (gender != null) {predicates.add(cb.equal(root.get("gender"), gender));}
+
+            if (organizationId != null) {
+                Join<User, UserAuthority> uaJoin =
+                        root.join("userAuthorities", JoinType.INNER);
+                predicates.add(
+                        cb.equal(
+                                uaJoin.get("organization").get("id"),
+                                organizationId
+                        )
+                );
+
+            }
+
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+
+        });
+
+        // sort bằng code
+        List<User> sorted = list.stream()
+                .sorted(Comparator.comparingInt(this::getAuthorityLevel))
+                .toList();
+
+        return sorted;
+    }
+
     private int getAuthorityLevel(User user) {
         if (user.getUserAuthorities() == null || user.getUserAuthorities().isEmpty()) {
             return Integer.MAX_VALUE;

@@ -23,6 +23,8 @@ public class EventRegistration {
 
     private String phone;
 
+    private Boolean isLeaderRegis;
+
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;

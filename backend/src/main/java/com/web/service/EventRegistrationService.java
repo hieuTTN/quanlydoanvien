@@ -215,8 +215,18 @@ public class EventRegistrationService {
 
     @Transactional
     public Map<String, Object> createAll(Long eventId, Long organizationId) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new MessageException("Không tìm thấy event"));
         List<User> users = userRepository.findByOrganizationId(organizationId);
+        return createByList(eventId, users);
+    }
+
+
+    @Transactional
+    public Map<String, Object> createAllByUserIds(Long eventId, List<Long> userId) {
+        List<User> users = userRepository.findAllById(userId);
+        return createByList(eventId, users);
+    }
+
+    public Map<String, Object> createByList(Long eventId, List<User> users){
         Map<String, Object> map = new HashMap<>();
         int success = 0;
         int fail = 0;
@@ -230,15 +240,16 @@ public class EventRegistrationService {
             }
             else{
                 ++ success;
-                EventRegistration e = new EventRegistration();
-                e.setEvent(event);
-                e.setStatus(RegistrationStatus.PENDING);
-                e.setUser(u);
-                e.setEmail(e.getEmail());
-                e.setFullName(e.getFullName());
-                e.setPhone(u.getPhone());
-                e.setRegistrationTime(now);
-                eventRegistrationRepository.save(e);
+//                EventRegistration e = new EventRegistration();
+//                e.setEvent(event);
+//                e.setStatus(RegistrationStatus.PENDING);
+//                e.setUser(u);
+//                e.setIsLeaderRegis(true);
+//                e.setEmail(e.getEmail());
+//                e.setFullName(e.getFullName());
+//                e.setPhone(u.getPhone());
+//                e.setRegistrationTime(now);
+//                eventRegistrationRepository.save(e);
             }
         }
         map.put("success",success);
